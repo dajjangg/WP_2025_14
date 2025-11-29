@@ -1,4 +1,4 @@
-// ¼­¹ö ½ÇÇà
+// ì„œë²„ ì‹¤í–‰
 const app = require("./app");
 const dotenv = require("dotenv");
 

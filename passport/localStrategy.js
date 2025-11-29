@@ -8,12 +8,12 @@ module.exports = (passport) => {
       try {
         const user = await userModel.findByUsername(username);
         if (!user) {
-          return done(null, false, { message: "Á¸ÀçÇÏÁö ¾Ê´Â »ç¿ëÀÚÀÔ´Ï´Ù." });
+          return done(null, false, { message: "ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ì‚¬ìš©ìì…ë‹ˆë‹¤." });
         }
 
         const isMatch = await bcrypt.compare(password, user.pw_hash);
         if (!isMatch) {
-          return done(null, false, { message: "ºñ¹Ğ¹øÈ£°¡ Æ²·È½À´Ï´Ù." });
+          return done(null, false, { message: "ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤." });
         }
 
         return done(null, user);

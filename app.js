@@ -7,22 +7,30 @@ const morgan = require("morgan");
 
 dotenv.config();
 
-// Passport ¼³Á¤ ºÒ·¯¿À±â
+// Passport ì„¤ì • ë¶ˆëŸ¬ì˜¤ê¸°
 const passportConfig = require("./passport/localStrategy");
 
-// ¶ó¿ìÆ® ºÒ·¯¿À±â
+// ë¼ìš°íŠ¸ ë¶ˆëŸ¬ì˜¤ê¸°
 const authRoutes = require("./routes/authRoutes");
 const photoRoutes = require("./routes/photoRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
 const app = express();
 
-// °øÅë ¹Ìµé¿ş¾î ¼³Á¤
+// ê³µí†µ ë¯¸ë“¤ì›¨ì–´ ì„¤ì •
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// ¼¼¼Ç ¼³Á¤
+
+// í•œê¸€ ê¹¨ì§ ë°©ì§€
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  next();
+});
+
+// ì„¸ì…˜ ì„¤ì •
 app.use(
   session({
     resave: false,
@@ -35,28 +43,32 @@ app.use(
   })
 );
 
-// Passport ÃÊ±âÈ­
-app.use(passport.initialize()); // ±âº» ±â´É È°¼ºÈ­
-app.use(passport.session());    // ¼¼¼Ç°ú ¿¬µ¿
-passportConfig(passport);       // localStrategy ½ÇÇàÇØ¼­ ·Î±×ÀÎ Àü·« Àû¿ë
+// Passport ì´ˆê¸°í™”
+app.use(passport.initialize()); // ê¸°ë³¸ ê¸°ëŠ¥ í™œì„±í™”
+app.use(passport.session());    // ì„¸ì…˜ê³¼ ì—°ë™
+passportConfig(passport);       // localStrategy ì‹¤í–‰í•´ì„œ ë¡œê·¸ì¸ ì „ëµ ì ìš©
 
-// Á¤Àû ÆÄÀÏ Á¦°ø (¾÷·Îµå ÀÌ¹ÌÁö Á¢±Ù °¡´É)
+// ì •ì  íŒŒì¼ ì œê³µ (ì—…ë¡œë“œ ì´ë¯¸ì§€ ì ‘ê·¼ ê°€ëŠ¥)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// API ¶ó¿ìÆ® ¿¬°á
+app.get("/", (req, res) => {
+  res.json({ message: "ì„œë²„ ì •ìƒ ì‘ë™ ì¤‘!" });
+});
+
+// API ë¼ìš°íŠ¸ ì—°ê²°
 app.use("/auth", authRoutes);
 app.use("/photo", photoRoutes);
 app.use("/comment", commentRoutes);
 
-// 404 ¿¡·¯ Ã³¸®
+// 404 ì—ëŸ¬ ì²˜ë¦¬
 app.use((req, res, next) => {
-  res.status(404).json({ message: "¶ó¿ìÅÍ°¡ ¾ø½À´Ï´Ù." });
+  res.status(404).json({ message: "ë¼ìš°í„°ê°€ ì—†ìŠµë‹ˆë‹¤." });
 });
 
-// ¼­¹ö ¿À·ù Ã³¸®
+// ì„œë²„ ì˜¤ë¥˜ ì²˜ë¦¬
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: err.message });
 });
 
-module.exports = app; // ½ÇÇàÀº index.js¿¡¼­ ÇÒ °ÍÀÓ
+module.exports = app; // ì‹¤í–‰ì€ index.jsì—ì„œ í•  ê²ƒì„

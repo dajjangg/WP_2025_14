@@ -1,0 +1,37 @@
+### 로그인 먼저 (세션 유지)
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "1234"
+}
+
+### 사진 업로드
+POST http://localhost:3000/photo/upload
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="test_cat.jpg"
+Content-Type: image/jpeg
+
+< ./test_images/test_cat.jpg
+--MyBoundary
+Content-Disposition: form-data; name="caption"
+
+다솜이
+--MyBoundary-- 
+
+### 사진 삭제 (예: 3번 사진)
+DELETE http://localhost:3000/photo/3
+
+### 댓글 작성
+POST http://localhost:3000/comment/5
+Content-Type: application/json
+
+{
+  "comment": "진짜 귀여워!!"
+}
+
+### 댓글 목록 조회
+GET http://localhost:3000/comment/5

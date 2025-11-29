@@ -8,13 +8,13 @@ exports.register = async (req, res) => {
   try {
     const exists = await userModel.findByUsername(username);
     if (exists) {
-      return res.status(400).json({ message: "ÀÌ¹Ì Á¸ÀçÇÏ´Â »ç¿ëÀÚ¸íÀÔ´Ï´Ù." });
+      return res.status(400).json({ message: "ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì‚¬ìš©ìëª…ì…ë‹ˆë‹¤." });
     }
 
     const hashed = await bcrypt.hash(password, 10);
     const userId = await userModel.createUser(username, hashed);
 
-    res.json({ message: "È¸¿ø°¡ÀÔ ¼º°ø", userId });
+    res.json({ message: "íšŒì›ê°€ì… ì„±ê³µ", userId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -27,13 +27,13 @@ exports.login = (req, res, next) => {
 
     req.login(user, (err) => {
       if (err) return next(err);
-      res.json({ message: "·Î±×ÀÎ ¼º°ø", user });
+      res.json({ message: "ë¡œê·¸ì¸ ì„±ê³µ", user });
     });
   })(req, res, next);
 };
 
 exports.logout = (req, res) => {
   req.logout(() => {
-    res.json({ message: "·Î±×¾Æ¿ô µÇ¾ú½À´Ï´Ù." });
+    res.json({ message: "ë¡œê·¸ì•„ì›ƒ ë˜ì—ˆìŠµë‹ˆë‹¤." });
   });
 };

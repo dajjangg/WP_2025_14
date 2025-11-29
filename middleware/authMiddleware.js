@@ -1,15 +1,15 @@
-// ·Î±×ÀÎ ¿©ºÎ È®ÀÎ ¹Ìµé¿ş¾î
+// ë¡œê·¸ì¸ ì—¬ë¶€ í™•ì¸ ë¯¸ë“¤ì›¨ì–´
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(401).json({ message: "·Î±×ÀÎÀÌ ÇÊ¿äÇÕ´Ï´Ù." });
+  return res.status(401).json({ message: "ë¡œê·¸ì¸ì´ í•„ìš”í•©ë‹ˆë‹¤." });
 };
 
-// ·Î±×ÀÎ ¾È µÈ »óÅÂ¿¡¼­¸¸ Á¢±Ù °¡´É (¿¹: È¸¿ø°¡ÀÔ ÆäÀÌÁö)
+// ë¡œê·¸ì¸ ì•ˆ ëœ ìƒíƒœì—ì„œë§Œ ì ‘ê·¼ ê°€ëŠ¥ (ì˜ˆ: íšŒì›ê°€ì… í˜ì´ì§€)
 exports.isNotLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return next();
   }
-  return res.status(403).json({ message: "ÀÌ¹Ì ·Î±×ÀÎÇÑ »óÅÂÀÔ´Ï´Ù." });
+  return res.status(403).json({ message: "ì´ë¯¸ ë¡œê·¸ì¸í•œ ìƒíƒœì…ë‹ˆë‹¤." });
 };

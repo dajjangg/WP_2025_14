@@ -1,0 +1,19 @@
+const multer = require("multer");
+const path = require("path");
+
+// uploads 폴더에 저장
+const storage = multer.diskStorage({
+  destination(req, file, done) {
+    done(null, path.join(__dirname, "../uploads"));
+  },
+
+  filename(req, file, done) {
+    const ext = path.extname(file.originalname);
+    const basename = path.basename(file.originalname, ext);
+    done(null, basename + "_" + Date.now() + ext);
+  },
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
