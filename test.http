@@ -1,4 +1,4 @@
-### 로그인 먼저 (세션 유지)
+### 항상 로그인 먼저 (세션 유지)
 POST http://localhost:3000/auth/login
 Content-Type: application/json
 
