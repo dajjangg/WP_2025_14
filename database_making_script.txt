@@ -1,0 +1,64 @@
+CREATE DATABASE wp_project;
+
+USE wp_project;
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(32) NOT NULL UNIQUE,
+    pw_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    caption VARCHAR(255),
+    description TEXT,
+    category VARCHAR(100) NOT NULL,
+    likes_count INT DEFAULT 0,
+    scraps_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE likes (
+    post_id INT,
+    user_id INT,
+    PRIMARY KEY (post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE scraps (
+    post_id INT,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE comments (
+    comment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE tags (
+    tag_id INT AUTO_INCREMENT PRIMARY KEY,
+    tag_name VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE post_tags (
+    post_id INT,
+    tag_id INT,
+    PRIMARY KEY (post_id, tag_id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
+);
+
