@@ -5,7 +5,7 @@ const path = require("path");
 exports.uploadPhoto = async (req, res) => {
   try {
     const user_id = req.user.id; // 로그인한 사용자
-    const image_path = req.file.filename;
+    const image_path = path.join("uploads", req.file.filename);
     const caption = req.body.caption || null;
 
     const photoId = await photoModel.createPhoto(user_id, image_path, caption);

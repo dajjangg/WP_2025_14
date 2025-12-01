@@ -38,3 +38,23 @@ exports.getComments = async (req, res) => {
     res.status(500).json({ error: "댓글 불러오기 실패" });
   }
 };
+
+exports.deleteComment = async (req, res) => {
+  try {
+    const comment_id = req.params.comment_id;
+    const user_id = req.user.id;  // 로그인한 사용자
+
+    const deleted = await commentModel.deleteComment(comment_id, user_id);
+
+    if (deleted === 0) {
+      return res.status(403).json({
+        message: "본인의 댓글만 삭제할 수 있습니다."
+      });
+    }
+
+    res.json({ message: "댓글 삭제 성공" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "댓글 삭제 실패" });
+  }
+};

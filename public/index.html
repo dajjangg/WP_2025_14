@@ -60,7 +60,7 @@
         card.className = "photo-card";
 
         card.innerHTML = `
-          <img src="/uploads/${photo.image_path}" />
+          <img src="/${photo.image_path}" />
           <div class="caption">${photo.caption ?? "(캡션 없음)"}</div>
         `;
 
@@ -72,7 +72,7 @@
     // 모달 열기
     function openModal(photo) {
       document.getElementById("modal").style.display = "flex";
-      document.getElementById("modal-img").src = `/uploads/${photo.image_path}`;
+      document.getElementById("modal-img").src = `/${photo.image_path}`;
       document.getElementById("modal-caption").textContent = photo.caption;
 
       // 댓글 불러오기

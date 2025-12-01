@@ -21,5 +21,15 @@ module.exports = {
       [photo_id]
     );
     return rows;
+  },
+
+  // 댓글 삭제
+  async deleteComment(comment_id, user_id) {
+    // 본인 댓글만 삭제 가능하도록 user_id 체크
+    const [result] = await db.query(
+      "DELETE FROM comments WHERE id = ? AND user_id = ?",
+      [comment_id, user_id]
+    );
+    return result.affectedRows; // 1이면 삭제 성공, 0이면 실패
   }
 };
