@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const upload = require("../config/multer");
-const photoController = require("../controllers/photoController");
+const photoController = require("../controllers/postController");
 const { isLoggedIn } = require("../middleware/authMiddleware");
 
 // 사진 업로드

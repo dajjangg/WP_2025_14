@@ -1,4 +1,4 @@
-const photoModel = require("../models/photoModel");
+const photoModel = require("../models/postModel");
 const fs = require("fs");
 const path = require("path");
 
