@@ -3,16 +3,16 @@ const passport = require("passport");
 const userModel = require("../models/userModel");
 
 exports.register = async (req, res) => {
-  const { username, password } = req.body;
+  const { user_name, password } = req.body;
 
   try {
-    const exists = await userModel.findByUsername(username);
+    const exists = await userModel.findByUsername(user_name);
     if (exists) {
       return res.status(400).json({ message: "이미 존재하는 사용자명입니다." });
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const userId = await userModel.createUser(username, hashed);
+    const userId = await userModel.createUser(user_name, hashed);
 
     res.json({ message: "회원가입 성공", userId });
   } catch (err) {

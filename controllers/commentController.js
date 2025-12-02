@@ -2,8 +2,8 @@ const commentModel = require("../models/commentModel");
 
 exports.addComment = async (req, res) => {
   try {
-    const photo_id = req.params.photo_id; // URL에서 가져옴
-    const user_id = req.user.id;          // 로그인된 사용자
+    const post_id = req.params.post_id; // URL에서 가져옴
+    const user_id = req.user.user_id;          // 로그인된 사용자
     const { comment } = req.body;
 
     if (!comment || comment.trim() === "") {
@@ -11,7 +11,7 @@ exports.addComment = async (req, res) => {
     }
 
     const commentId = await commentModel.createComment(
-      photo_id,
+      post_id,
       user_id,
       comment
     );
@@ -28,9 +28,9 @@ exports.addComment = async (req, res) => {
 
 exports.getComments = async (req, res) => {
   try {
-    const photo_id = req.params.photo_id;
+    const post_id = req.params.post_id;
 
-    const comments = await commentModel.getCommentsByPhotoId(photo_id);
+    const comments = await commentModel.getCommentsByPostId(post_id);
 
     res.json(comments);
   } catch (err) {
@@ -42,7 +42,7 @@ exports.getComments = async (req, res) => {
 exports.deleteComment = async (req, res) => {
   try {
     const comment_id = req.params.comment_id;
-    const user_id = req.user.id;  // 로그인한 사용자
+    const user_id = req.user.user_id;  // 로그인한 사용자
 
     const deleted = await commentModel.deleteComment(comment_id, user_id);
 

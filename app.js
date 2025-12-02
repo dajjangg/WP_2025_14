@@ -12,7 +12,7 @@ const passportConfig = require("./passport/localStrategy");
 
 // 라우트 불러오기
 const authRoutes = require("./routes/authRoutes");
-const photoRoutes = require("./routes/photoRoutes");
+const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
 const app = express();
@@ -57,7 +57,7 @@ app.get("/", (req, res) => {
 
 // API 라우트 연결
 app.use("/auth", authRoutes);
-app.use("/photo", photoRoutes);
+app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
 
 // 404 에러 처리
