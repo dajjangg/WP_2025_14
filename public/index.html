@@ -48,39 +48,39 @@
   </div>
 
   <script>
-    async function loadPhotos() {
-      const res = await fetch("/photo/");
+    async function loadPosts() {
+      const res = await fetch("/post/");
       const data = await res.json();
 
       const gallery = document.getElementById("gallery");
       gallery.innerHTML = "";
 
-      data.forEach(photo => {
+      data.forEach(post => {
         const card = document.createElement("div");
         card.className = "photo-card";
 
         card.innerHTML = `
-          <img src="/${photo.image_path}" />
-          <div class="caption">${photo.caption ?? "(캡션 없음)"}</div>
+          <img src="/${post.image_path}" />
+          <div class="caption">${post.caption ?? "(캡션 없음)"}</div>
         `;
 
-        card.addEventListener("click", () => openModal(photo));
+        card.addEventListener("click", () => openModal(post));
         gallery.appendChild(card);
       });
     }
 
     // 모달 열기
-    function openModal(photo) {
+    function openModal(post) {
       document.getElementById("modal").style.display = "flex";
-      document.getElementById("modal-img").src = `/${photo.image_path}`;
-      document.getElementById("modal-caption").textContent = photo.caption;
+      document.getElementById("modal-img").src = `/${post.image_path}`;
+      document.getElementById("modal-caption").textContent = post.caption;
 
       // 댓글 불러오기
-      loadComments(photo.photo_id);
+      loadComments(post.post_id);
 
       // 댓글 등록 버튼
       document.getElementById("commentBtn").onclick = () => {
-        addComment(photo.photo_id);
+        addComment(post.post_id);
       };
     }
 
@@ -89,8 +89,8 @@
     }
 
     // 댓글 불러오기
-    async function loadComments(photo_id) {
-      const res = await fetch(`/comment/${photo_id}`);
+    async function loadComments(post_id) {
+      const res = await fetch(`/comment/${post_id}`);
       const comments = await res.json();
 
       const commentsDiv = document.getElementById("comments");
@@ -99,19 +99,19 @@
       comments.forEach(c => {
         commentsDiv.innerHTML += `
           <div class="comment">
-            <b>${c.username}</b>: ${c.comment}
+            <b>${c.user_name}</b>: ${c.comment}
           </div>
         `;
       });
     }
 
     // 댓글 작성
-    async function addComment(photo_id) {
+    async function addComment(post_id) {
       const input = document.getElementById("commentInput");
       const text = input.value.trim();
       if (text === "") return;
 
-      const res = await fetch(`/comment/${photo_id}`, {
+      const res = await fetch(`/comment/${post_id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ comment: text })
@@ -120,11 +120,11 @@
       const data = await res.json();
       if (data.message) {
         input.value = "";
-        loadComments(photo_id); // 댓글 즉시 새로고침
+        loadComments(post_id); // 댓글 즉시 새로고침
       }
     }
 
-    loadPhotos();
+    loadPosts();
   </script>
 </body>
 </html>

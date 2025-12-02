@@ -4,9 +4,9 @@ const userModel = require("../models/userModel");
 
 module.exports = (passport) => {
   passport.use(
-    new LocalStrategy({ usernameField: "username" }, async (username, password, done) => {
+    new LocalStrategy({ usernameField: "user_name" }, async (user_name, password, done) => {
       try {
-        const user = await userModel.findByUsername(username);
+        const user = await userModel.findByUsername(user_name);
         if (!user) {
           return done(null, false, { message: "존재하지 않는 사용자입니다." });
         }
@@ -24,7 +24,7 @@ module.exports = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user.user_id);
   });
 
   passport.deserializeUser(async (id, done) => {
