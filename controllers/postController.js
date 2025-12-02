@@ -7,14 +7,23 @@ exports.uploadPost = async (req, res) => {
     const user_id = req.user.user_id; // 로그인한 사용자
     const image_path = path.join("uploads", req.file.filename);
     const caption = req.body.caption || null;
+    const description = req.body.description || null;
+    const category = req.body.category || null;
 
-    const postId = await postModel.createPost(user_id, image_path, caption);
+    const allowedCategories = ["한식", "중식", "양식", "일식", "기타"];
+    if (category && !allowedCategories.includes(category)) {
+      return res.status(400).json({ message: "잘못된 카테고리입니다." });
+    }
+
+    const postId = await postModel.createPost(user_id, image_path, caption, description, category);
 
     return res.json({ 
       message: "사진 업로드 성공", 
       postId,
       image_path,
-      caption
+      caption,
+      description,
+      category
     });
 
   } catch (err) {
@@ -38,6 +47,53 @@ exports.listPosts = async (req, res) => {
     return res.json(posts);
   } catch (err) {
     res.status(500).json({ error: "불러오기 실패" });
+  }
+};
+
+exports.updatePost = async (req, res) => {
+  try {
+    const postId = req.params.post_id;
+    const userId = req.user.user_id;
+
+    const { caption, description, category } = req.body;
+
+    const allowedCategories = ["한식", "중식", "양식", "일식", "기타"]; // category 제한
+
+    if (category && !allowedCategories.includes(category)) {
+      return res.status(400).json({ message: "잘못된 카테고리입니다." });
+    }
+
+    const post = await postModel.findById(postId);
+    if (!post) return res.status(404).json({ message: "게시물을 찾을 수 없습니다." });
+
+    if (post.user_id !== userId) {
+      return res.status(403).json({ message: "수정 권한이 없습니다." });
+    }
+
+    // 변경된 이미지 처리
+    let newImagePath = post.image_path;
+
+    if (req.file) {
+      // 기존 파일 삭제
+      const oldPath = path.join(__dirname, "..", post.image_path);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+
+      newImagePath = path.join("uploads", req.file.filename);
+    }
+
+    // 업데이트 실행
+    await postModel.updatePost(postId, {
+      caption,
+      description,
+      category,
+      image_path: newImagePath
+    });
+
+    res.json({ message: "게시물 수정 완료" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "수정 실패" });
   }
 };
 

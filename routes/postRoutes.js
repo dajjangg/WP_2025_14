@@ -11,6 +11,8 @@ router.post("/upload", isLoggedIn, upload.single("image"), postController.upload
 router.get("/", postController.getPosts);
 // 게시물 리스트 페이지용 (HTML 렌더링)
 router.get("/list", postController.listPosts);
+// 게시물 수정 (사진 포함)
+router.put("/:post_id", isLoggedIn, upload.single("image"), postController.updatePost);
 // 게시물 삭제
 router.delete("/:post_id", isLoggedIn, postController.deletePost);
 

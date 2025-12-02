@@ -17,7 +17,7 @@ Content-Type: application/json
   "password": "1234"
 }
 
-### 사진 업로드
+### 게시물 업로드
 POST http://localhost:3000/post/upload
 Content-Type: multipart/form-data; boundary=MyBoundary
 
@@ -32,8 +32,60 @@ Content-Disposition: form-data; name="caption"
 다솜이
 --MyBoundary-- 
 
-### 게시물 삭제 (예: 1번 게시물)
-DELETE http://localhost:3000/post/1
+### 게시물 업로드 (discription, category) 구현 확인
+POST http://localhost:3000/post/upload
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="test_cat.jpg"
+Content-Type: image/jpeg
+
+< ./test_images/test_cat.jpg
+--MyBoundary
+Content-Disposition: form-data; name="caption"
+
+테스트 캡션
+--MyBoundary
+Content-Disposition: form-data; name="description"
+
+이것은 설명입니다
+--MyBoundary
+Content-Disposition: form-data; name="category"
+
+한식
+--MyBoundary--
+
+### 전체 게시물 조회
+GET http://localhost:3000/post/
+Content-Type: application/json
+
+
+### 게시물 삭제
+DELETE http://localhost:3000/post/5
+
+### 게시물 수정
+PUT http://localhost:3000/post/3
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="caption"
+
+수정된 캡션입니다
+--MyBoundary
+Content-Disposition: form-data; name="description"
+
+수정된 설명입니다
+--MyBoundary
+Content-Disposition: form-data; name="category"
+
+한식
+--MyBoundary
+Content-Disposition: form-data; name="image"; filename="test_beach.jpg"
+Content-Type: image/jpeg
+
+< ./test_images/test_beach.jpg
+--MyBoundary--
+
 
 ### 댓글 작성
 POST http://localhost:3000/comment/3

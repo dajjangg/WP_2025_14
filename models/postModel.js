@@ -1,10 +1,10 @@
 const db = require("../config/db");
 
 module.exports = {
-  async createPost(user_id, image_path, caption) {
+  async createPost(user_id, image_path, caption, description, category) {
     const [result] = await db.query(
-      "INSERT INTO posts (user_id, image_path, caption) VALUES (?, ?, ?)",
-      [user_id, image_path, caption]
+      "INSERT INTO posts (user_id, image_path, caption, description, category) VALUES (?, ?, ?, ?, ?)",
+      [user_id, image_path, caption, description, category]
     );
     return result.insertId;
   },
@@ -32,6 +32,27 @@ module.exports = {
       [post_id]
     );
     return rows[0];
+  },
+
+  async updatePost(post_id, fields) {
+    const updates = [];
+    const values = [];
+
+    for (let key in fields) {
+      if (fields[key] !== undefined && fields[key] !== null) {
+        updates.push(`${key} = ?`);
+        values.push(fields[key]);
+      }
+    }
+
+    if (updates.length === 0) return;
+
+    values.push(post_id);
+
+    await db.query(
+      `UPDATE posts SET ${updates.join(", ")} WHERE post_id = ?`,
+      values
+    );
   },
 
   async deletePost(post_id) {
