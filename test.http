@@ -6,7 +6,14 @@ Content-Type: application/json
   "user_name": "test",
   "password": "1234"
 }
+### 회원가입 2
+POST http://localhost:3000/auth/register
+Content-Type: application/json
 
+{
+  "user_name": "test2",
+  "password": "1234"
+}
 
 ### 항상 로그인 먼저 (세션 유지)
 POST http://localhost:3000/auth/login
@@ -14,6 +21,14 @@ Content-Type: application/json
 
 {
   "user_name": "test",
+  "password": "1234"
+}
+### 로그인 2
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "user_name": "test2",
   "password": "1234"
 }
 
@@ -74,7 +89,7 @@ Content-Type: application/json
 
 
 ### 게시물 삭제
-DELETE http://localhost:3000/post/5
+DELETE http://localhost:3000/post/3
 
 ### 게시물 수정
 PUT http://localhost:3000/post/3
@@ -101,11 +116,19 @@ Content-Type: image/jpeg
 
 
 ### 댓글 작성
-POST http://localhost:3000/comment/3
+POST http://localhost:3000/comment/4
 Content-Type: application/json
 
 {
   "comment": "진짜 귀여워!!"
+}
+
+### 댓글 수정
+PUT http://localhost:3000/comment/1
+Content-Type: application/json
+
+{
+  "comment": "수정된 댓글 내용입니다!"
 }
 
 ### 댓글 목록 조회
