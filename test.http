@@ -132,4 +132,21 @@ Content-Type: application/json
 }
 
 ### 댓글 목록 조회
-GET http://localhost:3000/comment/3
+GET http://localhost:3000/comment/4
+
+### 댓글 삭제
+DELETE http://localhost:3000/comment/2
+
+### 좋아요 토글 (추가 또는 취소)
+POST http://localhost:3000/like/4
+Content-Type: application/json
+
+### 좋아요 수 조회
+GET http://localhost:3000/like/4/count
+
+### 스크랩 토글 (추가 또는 취소)
+POST http://localhost:3000/scraps/3
+Content-Type: application/json
+
+### 스크랩 수 조회
+GET http://localhost:3000/scraps/3/count
