@@ -47,7 +47,7 @@ Content-Disposition: form-data; name="caption"
 다솜이
 --MyBoundary-- 
 
-### 게시물 업로드 (discription, category) 구현 확인
+### 게시물 업로드 (discription, category, tag) 구현 확인
 POST http://localhost:3000/post/upload
 Content-Type: multipart/form-data; boundary=MyBoundary
 
@@ -145,8 +145,8 @@ Content-Type: application/json
 GET http://localhost:3000/like/4/count
 
 ### 스크랩 토글 (추가 또는 취소)
-POST http://localhost:3000/scraps/3
+POST http://localhost:3000/scrap/4
 Content-Type: application/json
 
 ### 스크랩 수 조회
-GET http://localhost:3000/scraps/3/count
+GET http://localhost:3000/scrap/4/count
