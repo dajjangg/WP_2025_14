@@ -15,7 +15,7 @@ CREATE TABLE posts (
     image_path VARCHAR(255) NOT NULL,
     caption VARCHAR(255),
     description TEXT,
-    category VARCHAR(100) NULL;
+    category VARCHAR(100) NULL,
     likes_count INT DEFAULT 0,
     scraps_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
