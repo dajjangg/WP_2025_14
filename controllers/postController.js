@@ -1,4 +1,5 @@
 const postModel = require("../models/postModel");
+const tagModel = require("../models/tagModel");
 const fs = require("fs");
 const path = require("path");
 
@@ -9,6 +10,7 @@ exports.uploadPost = async (req, res) => {
     const caption = req.body.caption || null;
     const description = req.body.description || null;
     const category = req.body.category || null;
+    const tags = req.body.tags ? req.body.tags.split(",") : [];
 
     const allowedCategories = ["한식", "중식", "양식", "일식", "기타"];
     if (category && !allowedCategories.includes(category)) {
@@ -17,7 +19,15 @@ exports.uploadPost = async (req, res) => {
 
     const postId = await postModel.createPost(user_id, image_path, caption, description, category);
 
-    return res.json({ 
+    //태그 처리
+    if (tags.length > 0) {
+      for (const tagName of tags) {
+        const tagId = await tagModel.findOrCreateTag(tagName.trim());
+        await tagModel.addTagToPost(postId, tagId);
+      }
+    }
+
+    return res.json({
       message: "사진 업로드 성공", 
       postId,
       image_path,
@@ -89,6 +99,17 @@ exports.updatePost = async (req, res) => {
       image_path: newImagePath
     });
 
+    // 태그 업데이트 (기존 태그 삭제 후 새로 추가)
+    if (tags) {
+      const tagArr = tags.split(",");
+      await tagModel.removeTagsFromPost(postId);
+      for (const tagName of tagArr) {
+        const tagId = await tagModel.findOrCreateTag(tagName.trim());
+        await tagModel.addTagToPost(postId, tagId);
+      }
+    }
+
+
     res.json({ message: "게시물 수정 완료" });
 
   } catch (err) {
@@ -120,6 +141,9 @@ exports.deletePost = async (req, res) => {
     }
     // DB에서도 삭제
     await postModel.deletePost(postId);
+
+    // 태그 정리, 아무도 안쓰는 tag 삭제 (tagModel 호출)
+    await tagModel.cleanupOrphanTags();
 
     res.json({ message: "사진 삭제 완료" });
 

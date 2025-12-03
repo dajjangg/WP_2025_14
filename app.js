@@ -14,6 +14,7 @@ const passportConfig = require("./passport/localStrategy");
 const authRoutes = require("./routes/authRoutes");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const tagRoutes = require("./routes/tagRoutes");
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
+app.use("/tag", tagRoutes);
 
 // 404 에러 처리
 app.use((req, res, next) => {

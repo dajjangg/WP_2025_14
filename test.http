@@ -53,10 +53,23 @@ Content-Disposition: form-data; name="description"
 Content-Disposition: form-data; name="category"
 
 한식
+--MyBoundary
+Content-Disposition: form-data; name="tags"
+
+한식,매운맛,테스트
+
 --MyBoundary--
 
 ### 전체 게시물 조회
 GET http://localhost:3000/post/
+Content-Type: application/json
+
+### 특정 태그로 게시물 조회 (tag_name 기반)
+GET http://localhost:3000/tag/name/매운맛/posts
+Content-Type: application/json
+
+### 특정 태그로 게시물 조회 (tag_id 기반)
+GET http://localhost:3000/tag/1/posts
 Content-Type: application/json
 
 
