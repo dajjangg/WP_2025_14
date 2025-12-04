@@ -4,13 +4,22 @@
   <meta charset="UTF-8">
   <title>게시물 업로드</title>
   <style>
+    * {
+    box-sizing: border-box;
+    }
+
+    html, body {
+      overflow-x: hidden;
+    }
+
     body {
       font-family: Arial;
-      margin: 0;
       padding: 0;
+      margin: 0;
       background: #f7f7f7;
     }
 
+    /* 상단 네비게이션 */
     .navbar {
       width: 100%;
       background: white;
@@ -22,6 +31,8 @@
       position: sticky;
       top: 0;
       z-index: 10;
+
+      flex-wrap: wrap;
     }
 
     .nav-left {
@@ -29,9 +40,29 @@
       font-weight: bold;
     }
 
+    .nav-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;          /* 버튼 줄바꿈 */
+    max-width: 100%;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    flex-shrink: 1;
+    min-width: 0;
+    }
+
+    .nav-right button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+    }
+
     .container {
       max-width: 600px;
-      margin: 40px auto;
+      margin: 20px auto;
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -45,32 +76,32 @@
     label {
       font-weight: bold;
       display: block;
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     input, textarea, select {
       width: 100%;
       padding: 8px;
       margin-top: 6px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
       box-sizing: border-box;
     }
 
     button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background: #0077cc;
-      color: white;
-      border: none;
+      padding: 8px 12px;
+      background: white;
+      color: black;
+      border: 1px solid #ccc;
       border-radius: 6px;
       cursor: pointer;
       transition: 0.2s;
     }
 
-    button:hover {
-      background: #005fa3;
-    }
+<!--    button:hover {-->
+<!--      background: #005fa3;-->
+<!--    }-->
   </style>
 </head>
 <body>
@@ -78,6 +109,7 @@
 <!-- 네비게이션 -->
 <div class="navbar">
   <div class="nav-left">📸 사진 갤러리</div>
+
   <div class="nav-right">
     <button onclick="goHome()">홈으로</button>
     <button onclick="goProfile()">내 프로필</button>
