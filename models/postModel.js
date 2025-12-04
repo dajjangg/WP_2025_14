@@ -10,13 +10,27 @@ module.exports = {
   },
 
   async getAllPosts() {
-    const [rows] = await db.query(
-      `SELECT p.*, u.user_name 
-       FROM posts p 
-       JOIN users u ON p.user_id = u.user_id
-       ORDER BY p.created_at DESC`
-    );
-    return rows;
+  const [rows] = await db.query(`
+    SELECT 
+      p.post_id,
+      p.user_id,
+      p.image_path,
+      p.caption,
+      p.description,
+      p.category,
+      p.likes_count,
+      p.scraps_count,
+      p.created_at,
+      u.user_name,
+      GROUP_CONCAT(t.tag_name SEPARATOR ' ') AS tags
+    FROM posts p
+    JOIN users u ON p.user_id = u.user_id
+    LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+    LEFT JOIN tags t ON pt.tag_id = t.tag_id
+    GROUP BY p.post_id
+    ORDER BY p.created_at DESC
+  `);
+  return rows;
   },
 
   async getAll() {

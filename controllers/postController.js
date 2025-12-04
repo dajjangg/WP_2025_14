@@ -10,7 +10,17 @@ exports.uploadPost = async (req, res) => {
     const caption = req.body.caption || null;
     const description = req.body.description || null;
     const category = req.body.category || null;
-    const tags = req.body.tags ? req.body.tags.split(",") : [];
+    let tags = []; // 태그 -> 띄어쓰기 구분, 배열/문자열 모두 처리
+    if (req.body.tags) {
+      const rawTags = Array.isArray(req.body.tags)
+        ? req.body.tags.join(" ")
+        : req.body.tags;
+
+      tags = rawTags
+        .split(" ")
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
+    }
 
     const allowedCategories = ["한식", "중식", "양식", "일식", "기타"];
     if (category && !allowedCategories.includes(category)) {
@@ -33,7 +43,8 @@ exports.uploadPost = async (req, res) => {
       image_path,
       caption,
       description,
-      category
+      category,
+      tags
     });
 
   } catch (err) {
@@ -66,6 +77,18 @@ exports.updatePost = async (req, res) => {
     const userId = req.user.user_id;
 
     const { caption, description, category } = req.body;
+
+    let tags = [];
+    if (req.body.tags) {
+      const rawTags = Array.isArray(req.body.tags)
+        ? req.body.tags.join(" ")     // 배열이면 공백 문자열로 합치기
+        : req.body.tags;              // 문자열이면 그대로
+
+      tags = rawTags
+        .split(" ")                   // 공백 기준 분리
+        .map(t => t.trim())
+        .filter(t => t.length > 0);   // 빈 문자열 제거
+    }
 
     const allowedCategories = ["한식", "중식", "양식", "일식", "기타"]; // category 제한
 
@@ -100,11 +123,13 @@ exports.updatePost = async (req, res) => {
     });
 
     // 태그 업데이트 (기존 태그 삭제 후 새로 추가)
-    if (tags) {
-      const tagArr = tags.split(",");
+    if (req.body.tags !== undefined) {
+      // 기존 태그 모두 삭제
       await tagModel.removeTagsFromPost(postId);
-      for (const tagName of tagArr) {
-        const tagId = await tagModel.findOrCreateTag(tagName.trim());
+
+      // 새 태그 등록
+      for (const tagName of tags) {
+        const tagId = await tagModel.findOrCreateTag(tagName);
         await tagModel.addTagToPost(postId, tagId);
       }
     }
