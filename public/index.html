@@ -4,12 +4,108 @@
   <meta charset="UTF-8">
   <title>사진 갤러리</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .gallery { display: flex; flex-wrap: wrap; gap: 16px; }
-    .photo-card {
-      width: 200px; border: 1px solid #ccc; padding: 10px;
-      border-radius: 8px; background: #fafafa; cursor:pointer;
+    * {
+    box-sizing: border-box;
     }
+    
+    html, body {
+      overflow-x: hidden;
+    }
+
+    body { 
+      font-family: Arial; 
+      padding: 0; 
+      margin: 0;
+      background: #f7f7f7;
+    }
+
+    /* 상단 네비게이션 */
+    .navbar {
+      width: 100%;
+      background: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      flex-wrap: wrap;
+    }
+
+    .nav-left {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .nav-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;          /* 버튼 줄바꿈 */
+    max-width: 100%;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    flex-shrink: 1;
+    min-width: 0;
+    }
+
+    .nav-right button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+    }
+
+    /* 카테고리 필터 */
+    .category-bar {
+      padding: 10px 30px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+
+    .category-btn {
+      margin-right: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .category-btn:hover {
+      background: #eee;
+    }
+
+    .gallery {
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 30px;
+      justify-content: flex-start;
+      box-sizing: border-box;
+    }
+
+    .photo-card {
+      width: 220px; 
+      border: 1px solid #ccc; 
+      padding: 10px;
+      border-radius: 8px; 
+      background: #fafafa; 
+      cursor:pointer;
+      transition: 0.3s;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
     .photo-card img { width: 100%; border-radius: 6px; }
 
     /* 모달 스타일 */
@@ -28,11 +124,36 @@
     #comments { margin-top: 15px; max-height: 200px; overflow-y: auto; }
     .comment { padding: 5px; border-bottom: 1px solid #eee; }
     .info-label { font-weight: bold; margin-top: 10px; }
-    .tags { color: #0077cc; font-weight: bold; }
+    .tags span {
+      margin-right: 5px;
+      color: #0077cc;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>📸 사진 갤러리</h1>
+
+  <!-- 네비게이션 -->
+  <div class="navbar">
+    <div class="nav-left">📸 사진 갤러리</div>
+
+    <div class="nav-right">
+      <button onclick="goLogin()">로그인</button>
+      <button onclick="goUpload()">게시물 업로드</button>
+      <button onclick="goProfile()">내 프로필</button>
+    </div>
+  </div>
+
+  <!-- 카테고리 필터 -->
+  <div class="category-bar">
+    <button class="category-btn" onclick="filterCategory('전체')">전체</button>
+    <button class="category-btn" onclick="filterCategory('한식')">한식</button>
+    <button class="category-btn" onclick="filterCategory('중식')">중식</button>
+    <button class="category-btn" onclick="filterCategory('양식')">양식</button>
+    <button class="category-btn" onclick="filterCategory('일식')">일식</button>
+    <button class="category-btn" onclick="filterCategory('기타')">기타</button>
+  </div>
+
   <div class="gallery" id="gallery"></div>
 
   <!-- 모달 -->
@@ -76,14 +197,23 @@
   </div>
 
   <script>
+    let allPosts = [];
+
+    function goLogin() { window.location.href = "/login.html"; }
+    function goUpload() { window.location.href = "/upload.html"; }
+    function goProfile() { window.location.href = "/profile.html"; }
+
     async function loadPosts() {
       const res = await fetch("/post/");
-      const data = await res.json();
+      allPosts = await res.json();
+      renderGallery(allPosts);
+    }
 
+    function renderGallery(posts) {
       const gallery = document.getElementById("gallery");
       gallery.innerHTML = "";
 
-      data.forEach(post => {
+      posts.forEach(post => {
         const card = document.createElement("div");
         card.className = "photo-card";
 
@@ -95,6 +225,12 @@
         card.addEventListener("click", () => openModal(post));
         gallery.appendChild(card);
       });
+    }
+
+    function filterCategory(cat) {
+      if (cat === "전체") return renderGallery(allPosts);
+      const filtered = allPosts.filter(p => p.category === cat);
+      renderGallery(filtered);
     }
 
     // 모달 열기
@@ -110,11 +246,12 @@
       document.getElementById("modal-likes").textContent = post.likes_count ?? 0;
       document.getElementById("modal-scraps").textContent = post.scraps_count ?? 0;
       const tags = typeof post.tags === "string"
-  ? post.tags.split(" ").filter(t => t.trim() !== "")
-  : [];
+      ? post.tags.split(" ").filter(t => t.trim() !== "")
+      : [];
 
-const tagHtml = tags.map(t => `<span>#${t}</span>`).join(" ");
-document.getElementById("modal-tags").innerHTML = tagHtml;
+      const tagHtml = tags.map(t => `<span>#${t}</span>`).join(" ");
+      document.getElementById("modal-tags").innerHTML = tagHtml;
+
       // 댓글 불러오기
       loadComments(post.post_id);
 
