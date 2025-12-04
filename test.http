@@ -52,26 +52,26 @@ POST http://localhost:3000/post/upload
 Content-Type: multipart/form-data; boundary=MyBoundary
 
 --MyBoundary
-Content-Disposition: form-data; name="image"; filename="test_cat.jpg"
+Content-Disposition: form-data; name="image"; filename="test_sushi.jpg"
 Content-Type: image/jpeg
 
-< ./test_images/test_cat.jpg
+< ./test_images/test_sushi.jpg
 --MyBoundary
 Content-Disposition: form-data; name="caption"
 
-테스트 캡션
+일본 여행 기념
 --MyBoundary
 Content-Disposition: form-data; name="description"
 
-이것은 설명입니다
+일본에서 스시를 머것서요
 --MyBoundary
 Content-Disposition: form-data; name="category"
 
-한식
+일식
 --MyBoundary
 Content-Disposition: form-data; name="tags"
 
-한식,매운맛,테스트
+일식 일본 여행 감성 맛집
 
 --MyBoundary--
 
@@ -92,21 +92,25 @@ Content-Type: application/json
 DELETE http://localhost:3000/post/3
 
 ### 게시물 수정
-PUT http://localhost:3000/post/3
+PUT http://localhost:3000/post/12
 Content-Type: multipart/form-data; boundary=MyBoundary
 
 --MyBoundary
 Content-Disposition: form-data; name="caption"
 
-수정된 캡션입니다
+어디 바다일까요
 --MyBoundary
 Content-Disposition: form-data; name="description"
 
-수정된 설명입니다
+경치를 먹는다 이것또한 한식
 --MyBoundary
 Content-Disposition: form-data; name="category"
 
 한식
+--MyBoundary
+Content-Disposition: form-data; name="tags"
+
+바다 경치 짠맛
 --MyBoundary
 Content-Disposition: form-data; name="image"; filename="test_beach.jpg"
 Content-Type: image/jpeg
@@ -116,37 +120,37 @@ Content-Type: image/jpeg
 
 
 ### 댓글 작성
-POST http://localhost:3000/comment/4
+POST http://localhost:3000/comment/12
 Content-Type: application/json
 
 {
-  "comment": "진짜 귀여워!!"
+  "comment": "짭니다 짜요"
 }
 
 ### 댓글 수정
-PUT http://localhost:3000/comment/1
+PUT http://localhost:3000/comment/8
 Content-Type: application/json
 
 {
-  "comment": "수정된 댓글 내용입니다!"
+  "comment": "사진이 조으네요 ㅎ"
 }
 
 ### 댓글 목록 조회
-GET http://localhost:3000/comment/4
+GET http://localhost:3000/comment/12
 
 ### 댓글 삭제
-DELETE http://localhost:3000/comment/2
+DELETE http://localhost:3000/comment/8
 
 ### 좋아요 토글 (추가 또는 취소)
-POST http://localhost:3000/like/4
+POST http://localhost:3000/like/12
 Content-Type: application/json
 
 ### 좋아요 수 조회
-GET http://localhost:3000/like/4/count
+GET http://localhost:3000/like/12/count
 
 ### 스크랩 토글 (추가 또는 취소)
-POST http://localhost:3000/scrap/4
+POST http://localhost:3000/scrap/12
 Content-Type: application/json
 
 ### 스크랩 수 조회
-GET http://localhost:3000/scrap/4/count
+GET http://localhost:3000/scrap/12/count

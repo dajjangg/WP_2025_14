@@ -10,10 +10,12 @@ exports.toggleScrap = async (req, res) => {
     if (alreadyScrapped) {
       // 이미 스크랩 → 취소
       await scrapModel.removeScrap(post_id, user_id);
+      await scrapModel.decreaseScrapCount(post_id);
       return res.json({ message: "스크랩 취소 성공" });
     } else {
       // 아직 안 했음 → 추가
       await scrapModel.addScrap(post_id, user_id);
+      await scrapModel.increaseScrapCount(post_id);
       return res.json({ message: "스크랩 성공" });
     }
   } catch (err) {

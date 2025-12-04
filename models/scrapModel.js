@@ -35,5 +35,20 @@ module.exports = {
       [post_id, user_id]
     );
     return rows.length > 0;
+  },
+
+  // 해당 post 스크랩 수 변경
+  async increaseScrapCount(post_id) {
+    await db.query(
+      "UPDATE posts SET scraps_count = scraps_count + 1 WHERE post_id = ?",
+      [post_id]
+    );
+  },
+
+  async decreaseScrapCount(post_id) {
+    await db.query(
+      "UPDATE posts SET scraps_count = GREATEST(scraps_count - 1, 0) WHERE post_id = ?",
+      [post_id]
+    );
   }
 };

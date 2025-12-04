@@ -35,5 +35,19 @@ module.exports = {
       [post_id, user_id]
     );
     return rows.length > 0;
+  },
+
+  // 해당 post 좋아요 카운트 변경
+  async increaseLikeCount(post_id) {
+    await db.query(
+    "UPDATE posts SET likes_count = likes_count + 1 WHERE post_id = ?",
+    [post_id]
+    );
+  },
+  async decreaseLikeCount(post_id) {
+    await db.query(
+    "UPDATE posts SET likes_count = likes_count - 1 WHERE post_id = ? AND likes_count > 0",
+    [post_id]
+    );
   }
 };
