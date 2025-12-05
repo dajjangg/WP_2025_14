@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>프로필 페이지</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* 화면 위쪽에서 조금 아래로 */
+      min-height: 100vh;
+      padding-top: 40px; /* 전체 화면 여백 */
+    }
+
+    .profile-container {
+      width: 520px;
+      background: white;
+      border-radius: 16px;
+      padding: 60px 40px; /* ⬅⬅ 패딩 크게 증가 */
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      margin-top: 60px;  /* 화면 위 여백 더 추가 */
+      margin-bottom: 60px;
+    }
+
+    /* 프로필 사진 */
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #ddd;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .profile-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 닉네임 */
+    .nickname {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    /* 소개 */
+    .intro {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+
+    /* 탭 메뉴 */
+    .tabs {
+      display: flex;
+      background: #f0f0f0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #666;
+      transition: 0.2s;
+    }
+
+    .tab.active {
+      background: white;
+      color: black;
+      border-bottom: 2px solid black;
+    }
+
+    .posts-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .post-card {
+      width: 100%;
+      height: 150px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .post-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="profile-container">
+    
+    <!-- 프로필 사진 -->
+    <div class="profile-image">
+      <img src="https://via.placeholder.com/150" alt="프로필 이미지">
+    </div>
+
+    <!-- 닉네임 -->
+    <div class="nickname">크레페</div>
+
+    <!-- 한 줄 소개 -->
+    <div class="intro">귀여움을 긁고 크레페를 만듭니다.</div>
+
+    <!-- 탭 -->
+    <div class="tabs">
+      <div class="tab active" id="tab-my-posts">게시물</div>
+      <div class="tab" id="tab-scraps">스크랩</div>
+    </div>
+
+    <!-- 게시물 영역 -->
+    <div class="posts-container" id="posts-area">
+      <div class="post-card"><img src="https://picsum.photos/300?1"></div>
+      <div class="post-card"><img src="https://picsum.photos/300?2"></div>
+      <div class="post-card"><img src="https://picsum.photos/300?3"></div>
+      <div class="post-card"><img src="https://picsum.photos/300?4"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const tabMyPosts = document.getElementById("tab-my-posts");
+    const tabScraps = document.getElementById("tab-scraps");
+    const postsArea = document.getElementById("posts-area");
+
+    // 더미 데이터
+    const myPosts = [
+      "https://picsum.photos/300?1",
+      "https://picsum.photos/300?2",
+      "https://picsum.photos/300?3",
+      "https://picsum.photos/300?4",
+    ];
+
+    const scrapPosts = [
+      "https://picsum.photos/300?10",
+      "https://picsum.photos/300?11",
+      "https://picsum.photos/300?12"
+    ];
+
+    // 탭 클릭 이벤트
+    tabMyPosts.addEventListener("click", () => {
+      tabMyPosts.classList.add("active");
+      tabScraps.classList.remove("active");
+      renderPosts(myPosts);
+    });
+
+    tabScraps.addEventListener("click", () => {
+      tabScraps.classList.add("active");
+      tabMyPosts.classList.remove("active");
+      renderPosts(scrapPosts);
+    });
+
+    // 게시물 렌더링 함수
+    function renderPosts(list) {
+      postsArea.innerHTML = "";
+      list.forEach(src => {
+        postsArea.innerHTML += `
+          <div class="post-card">
+            <img src="${src}">
+          </div>
+        `;
+      });
+    }
+  </script>
+
+</body>
+</html>

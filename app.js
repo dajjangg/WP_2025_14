@@ -17,6 +17,7 @@ const commentRoutes = require("./routes/commentRoutes");
 const tagRoutes = require("./routes/tagRoutes");
 const likeRoutes = require("./routes/likeRoutes");
 const scrapRoutes = require("./routes/scrapRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 const app = express();
 
@@ -65,6 +66,8 @@ app.use("/comment", commentRoutes);
 app.use("/tag", tagRoutes);
 app.use("/like", likeRoutes);
 app.use("/scrap", scrapRoutes);
+app.use("/search", searchRoutes);
+
 
 // 404 에러 처리
 app.use((req, res, next) => {
