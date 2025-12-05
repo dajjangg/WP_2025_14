@@ -10,7 +10,6 @@ router.post("/logout", authController.logout);
 // 내 프로필
 router.get("/me", isLoggedIn, authController.getMyProfile);
 // 다른 사람 프로필
-
 router.get("/:user_id/profile", authController.getUserProfile);
 
 module.exports = router;
