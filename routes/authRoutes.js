@@ -6,9 +6,11 @@ const { isLoggedIn } = require("../middleware/authMiddleware");
 router.post("/register", authController.register);
 router.post("/login", authController.login);
 router.post("/logout", authController.logout);
-// ³» ÇÁ·ÎÇÊ
+
+// ë‚´ í”„ë¡œí•„
 router.get("/me", isLoggedIn, authController.getMyProfile);
-// ´Ù¸¥ »ç¶÷ ÇÁ·ÎÇÊ
+// ë‹¤ë¥¸ ì‚¬ëžŒ í”„ë¡œí•„
+
 router.get("/:user_id/profile", authController.getUserProfile);
 
 module.exports = router;

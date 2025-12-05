@@ -7,14 +7,14 @@
     * {
     box-sizing: border-box;
     }
-    
+
     html, body {
       overflow-x: hidden;
     }
 
-    body { 
-      font-family: Arial; 
-      padding: 0; 
+    body {
+      font-family: Arial;
+      padding: 0;
       margin: 0;
       background: #f7f7f7;
     }
@@ -92,11 +92,11 @@
     }
 
     .photo-card {
-      width: 220px; 
-      border: 1px solid #ccc; 
+      width: 220px;
+      border: 1px solid #ccc;
       padding: 10px;
-      border-radius: 8px; 
-      background: #fafafa; 
+      border-radius: 8px;
+      background: #fafafa;
       cursor:pointer;
       transition: 0.3s;
     }
@@ -138,7 +138,8 @@
     <div class="nav-left">📸 사진 갤러리</div>
 
     <div class="nav-right">
-      <button onclick="goLogin()">로그인</button>
+      <button id="loginBtn" onclick="goLogin()">로그인</button>
+      <button id="logoutBtn" onclick="goLogout()" style="display:none;">로그아웃</button>
       <button onclick="goUpload()">게시물 업로드</button>
       <button onclick="goProfile()">내 프로필</button>
     </div>
@@ -162,7 +163,7 @@
       <button onclick="closeModal()">닫기</button>
 
       <img id="modal-img" src="" />
-      
+
       <p class="info-label">👤 작성자</p>
       <p id="modal-user"></p>
 
@@ -202,6 +203,35 @@
     function goLogin() { window.location.href = "/login.html"; }
     function goUpload() { window.location.href = "/upload.html"; }
     function goProfile() { window.location.href = "/profile.html"; }
+
+    async function goLogout() {
+      try {
+        const res = await fetch("/auth/logout", { method: "POST" });
+        const data = await res.json();
+        if (res.ok) {
+          alert("로그아웃 되었습니다.");
+          // 로그아웃 후 다시 메인페이지로 이동
+          window.location.href = "/index.html";
+        }
+      } catch (err) {
+        console.error("로그아웃 실패", err);
+      }
+    }
+
+    // 로그인 상태 확인
+    async function checkLoginStatus() {
+      try {
+        const res = await fetch("/auth/status");
+        const data = await res.json();
+
+        if (data.loggedIn) {
+          document.getElementById("loginBtn").style.display = "none";
+          document.getElementById("logoutBtn").style.display = "inline-block";
+        }
+      } catch (err) {
+        console.error("로그인 상태 확인 실패", err);
+      }
+    }
 
     async function loadPosts() {
       const res = await fetch("/post/");
@@ -301,6 +331,7 @@
       }
     }
 
+    checkLoginStatus();
     loadPosts();
   </script>
 </body>
