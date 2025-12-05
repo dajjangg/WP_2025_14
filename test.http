@@ -31,6 +31,29 @@ Content-Type: application/json
   "user_name": "test2",
   "password": "1234"
 }
+### 로그아웃
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+
+### 내 프로필 조회
+GET http://localhost:3000/auth/me
+Content-Type: application/json
+
+### 다른 사용자의 프로필 조회
+GET http://localhost:3000/auth/1/profile
+Content-Type: application/json
+
+### 단일 태그 검색
+GET http://localhost:3000/search?q=한식
+Content-Type: application/json
+
+### 다중 태그 검색
+GET http://localhost:3000/search?q=바다 제주
+Content-Type: application/json
+
+### 검색어 없이 요청 (400 error expected)
+GET http://localhost:3000/search
+Content-Type: application/json
 
 ### 게시물 업로드
 POST http://localhost:3000/post/upload
@@ -110,7 +133,7 @@ Content-Disposition: form-data; name="category"
 --MyBoundary
 Content-Disposition: form-data; name="tags"
 
-바다 경치 짠맛
+제주 바다 경치
 --MyBoundary
 Content-Disposition: form-data; name="image"; filename="test_beach.jpg"
 Content-Type: image/jpeg
