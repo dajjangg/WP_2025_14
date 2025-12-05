@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const { isLoggedIn, isNotLoggedIn } = require("../middleware/authMiddleware");
+const { isLoggedIn } = require("../middleware/authMiddleware");
 
-router.post("/register", isNotLoggedIn, authController.register);
-router.post("/login", isNotLoggedIn, authController.login);
-router.post("/logout", isLoggedIn, authController.logout);
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.post("/logout", authController.logout);
 //로그인 했는지 아닌지 체크
 router.get("/status", (req, res) => {
   if (req.isAuthenticated()) {
