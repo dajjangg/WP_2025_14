@@ -104,6 +104,39 @@
         background: #eee;
       }
 
+      .year-toggle {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid #aaa;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .month-toggle {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid #aaa;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .sort-toggle {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid #aaa;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
       /* 펼쳐지는 메뉴 */
       .dropdown-menu {
         position: absolute;
@@ -232,13 +265,11 @@
 
     <!-- 카테고리 필터 -->
     <div class="category-bar">
-      <button class="category-btn" onclick="filterCategory('전체')">전체 보기</button>
+      <button class="category-btn" onclick="resetFilters()">전체 보기</button>
       <!-- 드롭다운 버튼 -->
       <button class="dropdown-toggle" onclick="toggleDropdown()">
         카테고리 별 ▼
       </button>
-      <button class="search-btn" onclick="goSearch()">검색</button>
-
       <!-- 펼쳐지는 드롭다운 메뉴 -->
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-item" onclick="selectCategory('한식')">한식</div>
@@ -247,6 +278,41 @@
         <div class="dropdown-item" onclick="selectCategory('일식')">일식</div>
         <div class="dropdown-item" onclick="selectCategory('기타')">기타</div>
       </div>
+
+      <!-- 년도 버튼 -->
+      <button class="year-toggle" onclick="toggleYearDropdown()">년도 ▼</button>
+      <div class="dropdown-menu" id="yearDropdownMenu">
+        <div class="dropdown-item" onclick="selectYear('2025')">2025년</div>
+        <div class="dropdown-item" onclick="selectYear('2024')">2024년</div>
+        <div class="dropdown-item" onclick="selectYear('2023')">2023년</div>
+      </div>
+
+      <!-- 월 버튼 -->
+      <button class="month-toggle" onclick="toggleMonthDropdown()">월 ▼</button>
+      <div class="dropdown-menu" id="monthDropdownMenu">
+        <div class="dropdown-item" onclick="selectMonth('01')">1월</div>
+        <div class="dropdown-item" onclick="selectMonth('02')">2월</div>
+        <div class="dropdown-item" onclick="selectMonth('03')">3월</div>
+        <div class="dropdown-item" onclick="selectMonth('04')">4월</div>
+        <div class="dropdown-item" onclick="selectMonth('05')">5월</div>
+        <div class="dropdown-item" onclick="selectMonth('06')">6월</div>
+        <div class="dropdown-item" onclick="selectMonth('07')">7월</div>
+        <div class="dropdown-item" onclick="selectMonth('08')">8월</div>
+        <div class="dropdown-item" onclick="selectMonth('09')">9월</div>
+        <div class="dropdown-item" onclick="selectMonth('10')">10월</div>
+        <div class="dropdown-item" onclick="selectMonth('11')">11월</div>
+        <div class="dropdown-item" onclick="selectMonth('12')">12월</div>
+        <!-- 필요에 따라 12월까지 추가 -->
+      </div>
+
+      <button class="sort-toggle" onclick="toggleSortDropdown()">정렬 ▼</button>
+      <div class="dropdown-menu" id="sortDropdownMenu">
+        <div class="dropdown-item" onclick="selectSort('likes')">좋아요순</div>
+        <div class="dropdown-item" onclick="selectSort('newest')">최신순</div>
+        <div class="dropdown-item" onclick="selectSort('oldest')">오래된순</div>
+      </div>
+
+      <button class="search-btn" onclick="goSearch()">검색</button>
     </div>
 
     <div class="gallery" id="gallery"></div>
@@ -293,6 +359,10 @@
 
     <script>
       let allPosts = [];
+      let selectedCategory = "전체";
+      let selectedYear = "전체";
+      let selectedMonth = "전체";
+      let selectedSort = "newest"; // 기본값: 최신순
 
       function goLogin() { window.location.href = "/login.html"; }
       function goUpload() { window.location.href = "/upload.html"; }
@@ -357,10 +427,91 @@
         });
       }
 
-      function filterCategory(cat) {
-        if (cat === "전체") return renderGallery(allPosts);
-        const filtered = allPosts.filter(p => p.category === cat);
+      function resetFilters() {
+        selectedCategory = "전체";
+        selectedYear = "전체";
+        selectedMonth = "전체";
+
+        document.querySelector(".dropdown-toggle").textContent = "카테고리 별 ▼";
+        document.querySelector(".year-toggle").textContent = "년도 ▼";
+        document.querySelector(".month-toggle").textContent = "월 ▼";
+
+        renderGallery(allPosts);
+      }
+
+      function applyFilters() {
+        let filtered = allPosts;
+
+        // 카테고리 필터
+        if (selectedCategory !== "전체") {
+          filtered = filtered.filter(p => p.category === selectedCategory);
+        }
+
+        // 년도 필터
+        if (selectedYear !== "전체") {
+          filtered = filtered.filter(p => {
+            const date = new Date(p.created_at);
+            return date.getFullYear() === parseInt(selectedYear);
+          });
+        }
+
+        // 월 필터
+        if (selectedMonth !== "전체") {
+          filtered = filtered.filter(p => {
+            const date = new Date(p.created_at);
+            return (date.getMonth() + 1).toString().padStart(2, "0") === selectedMonth;
+          });
+        }
+
+        // 정렬 적용
+        if (selectedSort === "likes") {
+          filtered.sort((a, b) => b.likes_count - a.likes_count);
+        } else if (selectedSort === "newest") {
+          filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (selectedSort === "oldest") {
+          filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        }
+
         renderGallery(filtered);
+      }
+
+      function filterCategory(cat) {
+        const btn = document.querySelector(".dropdown-toggle");
+        selectedCategory = cat;
+
+        if (cat === "전체") {
+          btn.textContent = "카테고리 별 ▼"; // 초기 상태로 되돌리기
+          return renderGallery(allPosts);
+        }
+        else {
+          btn.textContent = cat; // 선택한 카테고리 이름 표시
+        }
+      }
+
+      function filterYear(year) {
+        const btn = document.querySelector(".year-toggle");
+        selectedYear = year;
+
+        if (year === "전체") {
+          btn.textContent = "년도 ▼";
+        } else {
+          btn.textContent = year + "년";
+        }
+
+        applyFilters();
+      }
+
+      function filterMonth(month) {
+        const btn = document.querySelector(".month-toggle");
+        selectedMonth = month;
+
+        if (month === "전체") {
+          btn.textContent = "월 ▼";
+        } else {
+          btn.textContent = month + "월";
+        }
+
+        applyFilters();
       }
 
       function toggleDropdown() {
@@ -368,11 +519,83 @@
         menu.style.display = menu.style.display === "flex" ? "none" : "flex";
       }
 
+      function toggleYearDropdown() {
+        const menu = document.getElementById("yearDropdownMenu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+      }
+
+      function toggleMonthDropdown() {
+        const menu = document.getElementById("monthDropdownMenu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+      }
+
+      function toggleSortDropdown() {
+        const menu = document.getElementById("sortDropdownMenu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+      }
+
       // 메뉴에서 항목 선택
       function selectCategory(category) {
-        filterCategory(category);
+        const btn = document.querySelector(".dropdown-toggle");
+        selectedCategory = category;
+
+        if (category === "전체") {
+          btn.textContent = "카테고리 별 ▼"; // 초기 상태로 되돌리기
+        } else {
+          btn.textContent = category; // 선택한 카테고리 이름 표시
+        }
+
+        // 드롭다운 닫기
         document.getElementById("dropdownMenu").style.display = "none";
+
+        // 공통 필터 적용
+        applyFilters();
       }
+
+      function selectYear(year) {
+        const btn = document.querySelector(".year-toggle");
+        selectedYear = year;
+
+        if (year === "전체") {
+          btn.textContent = "년도 ▼";
+        } else {
+          btn.textContent = year + "년";
+        }
+
+        document.getElementById("yearDropdownMenu").style.display = "none";
+        applyFilters();
+      }
+
+      function selectMonth(month) {
+        const btn = document.querySelector(".month-toggle");
+        selectedMonth = month;
+
+        if (month === "전체") {
+          btn.textContent = "월 ▼";
+        } else {
+          btn.textContent = month + "월";
+        }
+
+        document.getElementById("monthDropdownMenu").style.display = "none";
+        applyFilters();
+      }
+
+      function selectSort(sortType) {
+        const btn = document.querySelector(".sort-toggle");
+        selectedSort = sortType;
+
+        if (sortType === "likes") {
+          btn.textContent = "좋아요순";
+        } else if (sortType === "newest") {
+          btn.textContent = "최신순";
+        } else if (sortType === "oldest") {
+          btn.textContent = "오래된순";
+        }
+
+        document.getElementById("sortDropdownMenu").style.display = "none";
+        applyFilters(); // 정렬도 필터와 함께 적용
+      }
+
       function searchPosts() {
         const keyword = document.getElementById("searchInput").value.trim();
         if (keyword === "") return renderGallery(allPosts);
@@ -393,12 +616,30 @@
 
       // 화면 밖 클릭 시 드롭다운 닫기
       document.addEventListener("click", function (e) {
-        const menu = document.getElementById("dropdownMenu");
-        const btn = document.querySelector(".dropdown-toggle");
+        // 카테고리 메뉴
+        const categoryMenu = document.getElementById("dropdownMenu");
+        const categoryBtn = document.querySelector(".dropdown-toggle");
+        if (categoryMenu.style.display === "flex") {
+          if (!categoryMenu.contains(e.target) && !categoryBtn.contains(e.target)) {
+            categoryMenu.style.display = "none";
+          }
+        }
 
-        if (menu.style.display === "flex") {
-          if (!menu.contains(e.target) && !btn.contains(e.target)) {
-            menu.style.display = "none";
+        // 년도 메뉴
+        const yearMenu = document.getElementById("yearDropdownMenu");
+        const yearBtn = document.querySelector(".year-toggle");
+        if (yearMenu.style.display === "flex") {
+          if (!yearMenu.contains(e.target) && !yearBtn.contains(e.target)) {
+            yearMenu.style.display = "none";
+          }
+        }
+
+        // 월 메뉴
+        const monthMenu = document.getElementById("monthDropdownMenu");
+        const monthBtn = document.querySelector(".month-toggle");
+        if (monthMenu.style.display === "flex") {
+          if (!monthMenu.contains(e.target) && !monthBtn.contains(e.target)) {
+            monthMenu.style.display = "none";
           }
         }
       });
