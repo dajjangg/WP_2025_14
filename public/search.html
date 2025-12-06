@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>태그 검색</title>
+
+  <style>
+
+  * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      overflow-x: hidden;      }
+
+    body {
+      font-family: Arial;
+      padding: 0;
+      margin: 0;
+      background: #f7f7f7;
+    }
+
+    /* 상단 네비게이션 */
+    .navbar {
+      width: 100%;
+      background: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      flex-wrap: wrap;
+    }
+
+    .nav-left {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;          /* 버튼 줄바꿈 */
+      max-width: 100%;
+      justify-content: flex-end;
+      box-sizing: border-box;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    .nav-right button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .search-wrapper {
+      width: 100%;
+      max-width: 900px;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 검색창 */
+    .search-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .search-input {
+      width: 85%;
+      padding: 14px 20px;
+      font-size: 18px;
+      border: 2px solid #9b9b9b;
+      border-radius: 12px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+    .search-input:focus {
+      border-color: #000000;
+      box-shadow: 0 0 10px rgba(136, 211, 255, 0.5);
+    }
+
+    .search-btn {
+      margin-left: -50px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 22px;
+      color: #7bc2e0;
+      font-weight: bold;
+    }
+
+    /* 카드 그리드 */
+    .results-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 25px;
+      padding-bottom: 40px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.1);
+      transition: 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .card-tags {
+      font-size: 13px;
+      color: #888;
+    }
+
+    /* 안내 문구 */
+    .placeholder-text {
+      margin-top: 100px;
+      font-size: 18px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 네비게이션 -->
+    <div class="navbar">
+      <div class="nav-left">🍜 음식 갤러리</div>
+
+      <div class="nav-right">
+        <button onclick="goHome()">홈으로</button>
+        <button onclick="goUpload()">게시물 업로드</button>
+        <button onclick="goProfile()">내 프로필</button>
+      </div>
+    </div>
+  <div class="search-wrapper">
+    <!-- 검색창 -->
+    <div class="search-bar">
+      <input class="search-input" type="text" id="tagInput" placeholder="검색할 태그를 입력하세요. (예: 부산, 카페)" />
+      <button class="search-btn" onclick="searchTags()">➜</button>
+    </div>
+
+    <!-- 검색 결과 -->
+    <div id="resultGrid" class="results-grid"></div>
+
+    <!-- 기본 안내 문구 -->
+    <div id="placeholder" class="placeholder-text">
+      🔍 태그를 검색하면 게시물이 이곳에 표시됩니다.
+    </div>
+  </div>
+
+  <script>
+    function goHome() { window.location.href = "/index.html"; }
+    function goUpload() { window.location.href = "/upload.html"; }
+    function goProfile() { window.location.href = "/profile.html"; }
+    function searchTags() {
+      const keyword = document.getElementById("tagInput").value.trim();
+      const grid = document.getElementById("resultGrid");
+      const placeholder = document.getElementById("placeholder");
+
+      grid.innerHTML = ""; // 기존 결과 삭제
+
+      if (keyword === "") {
+        placeholder.style.display = "block";
+        return;
+      }
+
+      // 임시 더미 데이터 (나중에 서버 결과로 교체)
+      const dummyResults = [
+        { title: "부산 여행", tags: ["부산", "여행"], img: "https://picsum.photos/300?1" },
+        { title: "카페 추천", tags: ["카페", "디저트"], img: "https://picsum.photos/300?2" },
+        { title: "대구 핫플", tags: ["대구", "핫플"], img: "https://picsum.photos/300?3" },
+        { title: "맛집 모음", tags: ["맛집", "부산"], img: "https://picsum.photos/300?4" }
+      ];
+
+      // 검색 기능 (태그 포함 필터)
+      const results = dummyResults.filter(post =>
+        post.tags.some(tag => keyword.split(" ").includes(tag))
+      );
+
+      placeholder.style.display = results.length ? "none" : "block";
+
+      // 결과 렌더링
+      results.forEach(post => {
+        const card = `
+          <div class="card">
+            <img src="${post.img}" />
+            <div class="card-title">${post.title}</div>
+            <div class="card-tags">#${post.tags.join(" #")}</div>
+          </div>
+        `;
+        grid.innerHTML += card;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -4,24 +4,67 @@
   <meta charset="UTF-8">
   <title>프로필 페이지</title>
   <style>
+    * {
+    box-sizing: border-box;
+    }
+
+    html, body {
+      overflow-x: hidden;
+    }
+
     body {
       font-family: Arial;
+      padding: 0;
       margin: 0;
-      background: #f6f6f6;
+      background: #f7f7f7;
+    }
+
+    .navbar {
+      width: 100%;
+      background: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      flex-wrap: wrap;
+    }
+
+    .nav-left {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .nav-right button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .nav-right button:hover {
+      background: #eee;
+    }
+
+    .wrapper {
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* 화면 위쪽에서 조금 아래로 */
-      min-height: 100vh;
-      padding-top: 40px; /* 전체 화면 여백 */
+      margin-top: 40px;
+      padding: 20px;
     }
 
     .profile-container {
       width: 520px;
       background: white;
       border-radius: 16px;
-      padding: 60px 40px; /* ⬅⬅ 패딩 크게 증가 */
-      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-      margin-top: 60px;  /* 화면 위 여백 더 추가 */
+      padding: 40px 40px; /* ⬅⬅ 패딩 크게 증가 */
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      margin-top: 20px;  /* 화면 위 여백 더 추가 */
       margin-bottom: 60px;
     }
 
@@ -92,10 +135,11 @@
     .post-card {
       width: 100%;
       height: 150px;
-      background: #ddd;
+      background: #fafafa;
       border-radius: 10px;
       overflow: hidden;
       cursor: pointer;
+      transition: 0.2s;
     }
 
     .post-card img {
@@ -103,58 +147,133 @@
       height: 100%;
       object-fit: cover;
     }
+    .post-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    /* 오른쪽 모달 */
+    #modal {
+      position: fixed;
+      top: 148px;
+      right: 90px;
+      width: 25%;          /* 오른쪽 영역만 사용 (더 좁게) */
+      height: 70%;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      padding: auto;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      z-index: 2000;
+      border-radius: 16px;
+    }
 
+    /* 모달 내부 카드 디자인 — 프로필 박스 느낌으로 */
+    #modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 이미지 크기 */
+    #modal img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    /* 닫기 버튼 */
+    #modal-content button {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    #modal-content button:hover {
+      background: #eee;
+    }
+
+    #comments { margin-top: 15px; max-height: 200px; overflow-y: auto; }
+      .comment { padding: 5px; border-bottom: 1px solid #eee; }
+      .info-label { font-weight: bold; margin-top: 10px; }
+      .tags span {
+        margin-right: 5px;
+        color: #0077cc;
+        font-weight: bold;
+      }
   </style>
 </head>
 <body>
+  <div class="navbar">
+    <div class="nav-left">🍜 음식 갤러리</div>
 
-  <div class="profile-container">
+    <div class="nav-right">
+      <button onclick="goHome()">홈으로</button>
+      <button onclick="goUpload()">게시물 업로드</button>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <div class="profile-container">
     
-    <!-- 프로필 사진 -->
-    <div class="profile-image">
-      <img src="https://via.placeholder.com/150" alt="프로필 이미지">
+      <!-- 프로필 사진 -->
+      <div class="profile-image">
+        <img src="" alt="프로필 이미지">
+      </div>
+
+      <!-- 닉네임 -->
+      <div class="nickname"></div>
+
+      <!-- 한 줄 소개 -->
+      <div class="intro"></div>
+
+      <!-- 탭 -->
+      <div class="tabs">
+        <div class="tab active" id="tab-my-posts">게시물</div>
+        <div class="tab" id="tab-scraps">스크랩</div>
+      </div>
+
+      <!-- 게시물 영역 -->
+      <div class="posts-container" id="posts-area"></div>
     </div>
-
-    <!-- 닉네임 -->
-    <div class="nickname">크레페</div>
-
-    <!-- 한 줄 소개 -->
-    <div class="intro">귀여움을 긁고 크레페를 만듭니다.</div>
-
-    <!-- 탭 -->
-    <div class="tabs">
-      <div class="tab active" id="tab-my-posts">게시물</div>
-      <div class="tab" id="tab-scraps">스크랩</div>
-    </div>
-
-    <!-- 게시물 영역 -->
-    <div class="posts-container" id="posts-area">
-      <div class="post-card"><img src="https://picsum.photos/300?1"></div>
-      <div class="post-card"><img src="https://picsum.photos/300?2"></div>
-      <div class="post-card"><img src="https://picsum.photos/300?3"></div>
-      <div class="post-card"><img src="https://picsum.photos/300?4"></div>
-    </div>
-
   </div>
 
   <script>
+    function goUpload() { window.location.href = "/upload.html"; }
+
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("user_id");
     const tabMyPosts = document.getElementById("tab-my-posts");
     const tabScraps = document.getElementById("tab-scraps");
     const postsArea = document.getElementById("posts-area");
 
-    // 더미 데이터
-    const myPosts = [
-      "https://picsum.photos/300?1",
-      "https://picsum.photos/300?2",
-      "https://picsum.photos/300?3",
-      "https://picsum.photos/300?4",
-    ];
+    let myPosts = [];
+    let scrapPosts = [];
 
-    const scrapPosts = [
-      "https://picsum.photos/300?10",
-      "https://picsum.photos/300?11",
-      "https://picsum.photos/300?12"
-    ];
+    async function loadUserProfile() {
+      const res = await fetch(`/auth/${userId}/profile`);
+      const data = await res.json();
+
+      // 프로필 UI 세팅
+      document.querySelector(".nickname").textContent = data.user.user_name;
+      document.querySelector(".intro").textContent = data.user.intro ? data.user.intro : "소개가 없습니다.";
+
+      document.querySelector(".profile-image img").src = data.user.profile_image
+          ? `/${data.user.profile_image}`
+          : "https://via.placeholder.com/150";
+
+      // 게시물 데이터 저장
+      myPosts = data.posts;
+      scrapPosts = data.scraps;
+
+      renderPosts(myPosts);
+    }
+
 
     // 탭 클릭 이벤트
     tabMyPosts.addEventListener("click", () => {
@@ -169,18 +288,137 @@
       renderPosts(scrapPosts);
     });
 
+    function goHome() {
+      window.location.href = "/";
+    }
+
     // 게시물 렌더링 함수
     function renderPosts(list) {
       postsArea.innerHTML = "";
-      list.forEach(src => {
-        postsArea.innerHTML += `
-          <div class="post-card">
-            <img src="${src}">
+      list.forEach(post => {
+        const card = document.createElement("div");
+        card.className = "post-card";
+        card.innerHTML = `<img src="${post.image_path}" />`;
+
+        card.addEventListener("click", () => openModal(post));
+
+        postsArea.appendChild(card);
+      });
+    }
+    
+    function openModal(post) {
+      console.log("태그 확인:", post.tags);
+      document.getElementById("modal").style.display = "block";
+
+      document.getElementById("modal-img").src = "/" + post.image_path;
+      document.getElementById("modal-caption").textContent = post.caption ?? "";
+      document.getElementById("modal-description").textContent = post.description ?? "";
+      document.getElementById("modal-user").textContent = post.user_name ?? "";
+      document.getElementById("modal-date").textContent = new Date(post.created_at).toLocaleString();
+      document.getElementById("modal-likes").textContent = post.likes_count ?? 0;
+      document.getElementById("modal-scraps").textContent = post.scraps_count ?? 0;
+
+      let tags = [];
+
+      if (typeof post.tags === "string") {
+          tags = post.tags.split(" ").filter(t => t.trim() !== "");
+      } else if (Array.isArray(post.tags)) {
+          tags = post.tags;
+      }
+      document.getElementById("modal-tags").innerHTML =
+      tags.map(t => `<span>#${t}</span>`).join(" ");
+
+      document.getElementById("modal-category").textContent =
+      post.category ?? "카테고리 없음";
+      // 댓글 불러오기
+      loadComments(post.post_id);
+
+        // 댓글 등록 버튼
+      document.getElementById("commentBtn").onclick = () => {
+        addComment(post.post_id);
+      };
+    }
+
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+    // 댓글 불러오기
+    async function loadComments(post_id) {
+      const res = await fetch(`/comment/${post_id}`);
+      const comments = await res.json();
+
+      const commentsDiv = document.getElementById("comments");
+      commentsDiv.innerHTML = "";
+
+      comments.forEach(c => {
+        commentsDiv.innerHTML += `
+          <div class="comment">
+            <b>${c.user_name}</b>: ${c.comment}
           </div>
         `;
       });
-    }
-  </script>
+      }
 
+      // 댓글 작성
+      async function addComment(post_id) {
+        const input = document.getElementById("commentInput");
+        const text = input.value.trim();
+        if (text === "") return;
+
+        const res = await fetch(`/comment/${post_id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment: text })
+        });
+
+        const data = await res.json();
+        if (data.message) {
+          input.value = "";
+          loadComments(post_id); // 댓글 즉시 새로고침
+        }
+      }
+
+    loadUserProfile();
+  </script>
+    <!-- ===== 모달 ===== -->
+  <div id="modal">
+      <div id="modal-content">
+        <button onclick="closeModal()">닫기</button>
+
+        <img id="modal-img" src="" />
+
+        <p class="info-label">👤 작성자</p>
+        <p id="modal-user"></p>
+
+        <p class="info-label">📅 작성일</p>
+        <p id="modal-date"></p>
+
+        <p class="info-label">✏️ 캡션</p>
+        <p id="modal-caption"></p>
+
+        <p class="info-label">📝 설명</p>
+        <p id="modal-description"></p>
+
+        <p class="info-label">🏷 태그</p>
+        <p id="modal-tags"></p>
+
+        <p class="info-label">🍽 카테고리</p>
+        <p id="modal-category"></p>
+
+        <p class="info-label">❤️ 좋아요 수</p>
+        <p id="modal-likes"></p>
+
+        <p class="info-label">⭐ 스크랩 수</p>
+        <p id="modal-scraps"></p>
+
+        <h3>댓글</h3>
+        <div id="comments"></div>
+
+        <h4>댓글 작성</h4>
+        <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
+        <button id="commentBtn">등록</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
