@@ -88,7 +88,7 @@
       .category-btn:hover {
         background: #eee;
       }
-      
+
       .dropdown-toggle {
         padding: 6px 14px;
         border-radius: 20px;
@@ -137,11 +137,16 @@
         gap: 6px;
       }
 
+      .dropdown-wrapper {
+        position: relative; /* 버튼 기준으로 메뉴 위치 */
+        display: inline-block;
+      }
+
       /* 펼쳐지는 메뉴 */
       .dropdown-menu {
         position: absolute;
-        top: 50px;
-        left: 110px; /* 전체 버튼 오른쪽 정렬 */
+        top: 130%;   /* 버튼 바로 아래 */
+        left: 0;     /* 버튼 왼쪽 기준 */
         background: white;
         border: 1px solid #ccc;
         border-radius: 10px;
@@ -150,6 +155,8 @@
         flex-direction: column;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         z-index: 20;
+        max-height: 310px;   /* 원하는 높이 제한 */
+        overflow-y: auto;    /* 스크롤바 표시 */
       }
 
       .dropdown-item {
@@ -266,51 +273,57 @@
     <!-- 카테고리 필터 -->
     <div class="category-bar">
       <button class="category-btn" onclick="resetFilters()">전체 보기</button>
-      <!-- 드롭다운 버튼 -->
-      <button class="dropdown-toggle" onclick="toggleDropdown()">
-        카테고리 별 ▼
-      </button>
-      <!-- 펼쳐지는 드롭다운 메뉴 -->
-      <div class="dropdown-menu" id="dropdownMenu">
-        <div class="dropdown-item" onclick="selectCategory('한식')">한식</div>
-        <div class="dropdown-item" onclick="selectCategory('중식')">중식</div>
-        <div class="dropdown-item" onclick="selectCategory('양식')">양식</div>
-        <div class="dropdown-item" onclick="selectCategory('일식')">일식</div>
-        <div class="dropdown-item" onclick="selectCategory('기타')">기타</div>
+      <!-- 카테고리 -->
+      <div class="dropdown-wrapper">
+        <button class="dropdown-toggle" onclick="toggleDropdown()">카테고리 ▼</button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <div class="dropdown-item" onclick="selectCategory('한식')">한식</div>
+          <div class="dropdown-item" onclick="selectCategory('중식')">중식</div>
+          <div class="dropdown-item" onclick="selectCategory('양식')">양식</div>
+          <div class="dropdown-item" onclick="selectCategory('일식')">일식</div>
+          <div class="dropdown-item" onclick="selectCategory('기타')">기타</div>
+        </div>
       </div>
 
-      <!-- 년도 버튼 -->
-      <button class="year-toggle" onclick="toggleYearDropdown()">년도 ▼</button>
-      <div class="dropdown-menu" id="yearDropdownMenu">
-        <div class="dropdown-item" onclick="selectYear('2025')">2025년</div>
-        <div class="dropdown-item" onclick="selectYear('2024')">2024년</div>
-        <div class="dropdown-item" onclick="selectYear('2023')">2023년</div>
+      <!-- 년도 -->
+      <div class="dropdown-wrapper">
+        <button class="year-toggle" onclick="toggleYearDropdown()">년도 ▼</button>
+        <div class="dropdown-menu" id="yearDropdownMenu">
+          <div class="dropdown-item" onclick="selectYear('2025')">2025년</div>
+          <div class="dropdown-item" onclick="selectYear('2024')">2024년</div>
+          <div class="dropdown-item" onclick="selectYear('2023')">2023년</div>
+        </div>
       </div>
 
-      <!-- 월 버튼 -->
-      <button class="month-toggle" onclick="toggleMonthDropdown()">월 ▼</button>
-      <div class="dropdown-menu" id="monthDropdownMenu">
-        <div class="dropdown-item" onclick="selectMonth('01')">1월</div>
-        <div class="dropdown-item" onclick="selectMonth('02')">2월</div>
-        <div class="dropdown-item" onclick="selectMonth('03')">3월</div>
-        <div class="dropdown-item" onclick="selectMonth('04')">4월</div>
-        <div class="dropdown-item" onclick="selectMonth('05')">5월</div>
-        <div class="dropdown-item" onclick="selectMonth('06')">6월</div>
-        <div class="dropdown-item" onclick="selectMonth('07')">7월</div>
-        <div class="dropdown-item" onclick="selectMonth('08')">8월</div>
-        <div class="dropdown-item" onclick="selectMonth('09')">9월</div>
-        <div class="dropdown-item" onclick="selectMonth('10')">10월</div>
-        <div class="dropdown-item" onclick="selectMonth('11')">11월</div>
-        <div class="dropdown-item" onclick="selectMonth('12')">12월</div>
-        <!-- 필요에 따라 12월까지 추가 -->
+      <!-- 월 -->
+      <div class="dropdown-wrapper">
+        <button class="month-toggle" onclick="toggleMonthDropdown()">월 ▼</button>
+        <div class="dropdown-menu" id="monthDropdownMenu">
+          <div class="dropdown-item" onclick="selectMonth('01')">1월</div>
+          <div class="dropdown-item" onclick="selectMonth('02')">2월</div>
+          <div class="dropdown-item" onclick="selectMonth('03')">3월</div>
+          <div class="dropdown-item" onclick="selectMonth('04')">4월</div>
+          <div class="dropdown-item" onclick="selectMonth('05')">5월</div>
+          <div class="dropdown-item" onclick="selectMonth('06')">6월</div>
+          <div class="dropdown-item" onclick="selectMonth('07')">7월</div>
+          <div class="dropdown-item" onclick="selectMonth('08')">8월</div>
+          <div class="dropdown-item" onclick="selectMonth('09')">9월</div>
+          <div class="dropdown-item" onclick="selectMonth('10')">10월</div>
+          <div class="dropdown-item" onclick="selectMonth('11')">11월</div>
+          <div class="dropdown-item" onclick="selectMonth('12')">12월</div>
+        </div>
       </div>
 
-      <button class="sort-toggle" onclick="toggleSortDropdown()">정렬 ▼</button>
-      <div class="dropdown-menu" id="sortDropdownMenu">
-        <div class="dropdown-item" onclick="selectSort('likes')">좋아요순</div>
-        <div class="dropdown-item" onclick="selectSort('newest')">최신순</div>
-        <div class="dropdown-item" onclick="selectSort('oldest')">오래된순</div>
+      <!-- 정렬 -->
+      <div class="dropdown-wrapper">
+        <button class="sort-toggle" onclick="toggleSortDropdown()">정렬 ▼</button>
+        <div class="dropdown-menu" id="sortDropdownMenu">
+          <div class="dropdown-item" onclick="selectSort('newest')">최신순</div>
+          <div class="dropdown-item" onclick="selectSort('likes')">좋아요순</div>
+          <div class="dropdown-item" onclick="selectSort('oldest')">오래된순</div>
+        </div>
       </div>
+
 
       <button class="search-btn" onclick="goSearch()">검색</button>
     </div>
@@ -436,7 +449,7 @@
         document.querySelector(".year-toggle").textContent = "년도 ▼";
         document.querySelector(".month-toggle").textContent = "월 ▼";
 
-        renderGallery(allPosts);
+        applyFilters();
       }
 
       function applyFilters() {
@@ -464,54 +477,15 @@
         }
 
         // 정렬 적용
-        if (selectedSort === "likes") {
-          filtered.sort((a, b) => b.likes_count - a.likes_count);
-        } else if (selectedSort === "newest") {
+        if (selectedSort === "newest") {
           filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (selectedSort === "likes") {
+          filtered.sort((a, b) => b.likes_count - a.likes_count);
         } else if (selectedSort === "oldest") {
           filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         }
 
         renderGallery(filtered);
-      }
-
-      function filterCategory(cat) {
-        const btn = document.querySelector(".dropdown-toggle");
-        selectedCategory = cat;
-
-        if (cat === "전체") {
-          btn.textContent = "카테고리 별 ▼"; // 초기 상태로 되돌리기
-          return renderGallery(allPosts);
-        }
-        else {
-          btn.textContent = cat; // 선택한 카테고리 이름 표시
-        }
-      }
-
-      function filterYear(year) {
-        const btn = document.querySelector(".year-toggle");
-        selectedYear = year;
-
-        if (year === "전체") {
-          btn.textContent = "년도 ▼";
-        } else {
-          btn.textContent = year + "년";
-        }
-
-        applyFilters();
-      }
-
-      function filterMonth(month) {
-        const btn = document.querySelector(".month-toggle");
-        selectedMonth = month;
-
-        if (month === "전체") {
-          btn.textContent = "월 ▼";
-        } else {
-          btn.textContent = month + "월";
-        }
-
-        applyFilters();
       }
 
       function toggleDropdown() {
@@ -584,10 +558,10 @@
         const btn = document.querySelector(".sort-toggle");
         selectedSort = sortType;
 
-        if (sortType === "likes") {
-          btn.textContent = "좋아요순";
-        } else if (sortType === "newest") {
+        if (sortType === "newest") {
           btn.textContent = "최신순";
+        } else if (sortType === "likes") {
+          btn.textContent = "좋아요순";
         } else if (sortType === "oldest") {
           btn.textContent = "오래된순";
         }
@@ -642,6 +616,15 @@
             monthMenu.style.display = "none";
           }
         }
+
+        // 정렬 메뉴
+          const sortMenu = document.getElementById("sortDropdownMenu");
+          const sortBtn = document.querySelector(".sort-toggle");
+          if (sortMenu.style.display === "flex") {
+            if (!sortMenu.contains(e.target) && !sortBtn.contains(e.target)) {
+              sortMenu.style.display = "none";
+            }
+          }
       });
 
       // 모달 열기
