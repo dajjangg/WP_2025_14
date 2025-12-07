@@ -22,7 +22,7 @@ module.exports = {
   // 특정 게시물 스크랩 수 조회
   async countScraps(post_id) {
     const [rows] = await db.query(
-      "SELECT COUNT(*) AS scrapCount FROM scraps WHERE post_id = ?",
+      "SELECT scraps_count AS scrapCount FROM posts WHERE post_id = ?",
       [post_id]
     );
     return rows[0].scrapCount;

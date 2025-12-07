@@ -22,7 +22,7 @@ module.exports = {
   // 좋아요 수 조회
   async countLikes(post_id) {
     const [rows] = await db.query(
-      "SELECT COUNT(*) AS likeCount FROM likes WHERE post_id = ?",
+      "SELECT likes_count AS likeCount FROM posts WHERE post_id = ?",
       [post_id]
     );
     return rows[0].likeCount;
