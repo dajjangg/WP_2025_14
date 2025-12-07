@@ -5,9 +5,18 @@ module.exports = {
     const placeholders = tagNames.map(() => "?").join(",");
 
     const sql = `
-      SELECT 
-        p.*, 
+      SELECT
+        p.post_id,
+        p.user_id,
+        p.image_path,
+        p.caption,
+        p.description,
+        p.category,
+        p.likes_count,
+        p.scraps_count,
+        p.created_at,
         u.user_name,
+        GROUP_CONCAT(t.tag_name) AS tags,
         COUNT(*) AS match_count
       FROM posts p
       JOIN post_tags pt ON p.post_id = pt.post_id
