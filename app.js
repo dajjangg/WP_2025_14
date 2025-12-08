@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("passport");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -33,6 +34,11 @@ app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   next();
 });
+
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 
 // 세션 설정
 app.use(
