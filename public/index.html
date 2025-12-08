@@ -128,7 +128,7 @@
         align-items: center;
         gap: 6px;
       }
-      .month-toggle:hover{
+      .month-toggle:hover {
         background: #eee;
       }
 
@@ -142,7 +142,7 @@
         align-items: center;
         gap: 6px;
       }
-      .sort-toggle:hover{
+      .sort-toggle:hover {
         background: #eee;
       }
 
@@ -591,15 +591,13 @@
           window.location.href = "/login.html";
           return;
         }
-
+        const btn = event.currentTarget;
         const res = await fetch(`/scrap/${post_id}`, { 
           method: "POST", 
           credentials: "include"
         });
         const data = await res.json();
         console.log(data);
-
-        const btn = event.currentTarget;
         btn.classList.toggle("active", data.scrapped);
 
         const countRes = await fetch(`/scrap/${post_id}/count`);
