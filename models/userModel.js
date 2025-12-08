@@ -24,9 +24,10 @@ module.exports = {
     );
     return result.insertId;
   },
+
   async getUserById(user_id) {
     const [rows] = await db.query(
-      `SELECT user_id, user_name, profile_image, created_at 
+      `SELECT user_id, user_name, profile_image, intro, created_at 
       FROM users WHERE user_id = ?`,
       [user_id]
     );
@@ -35,7 +36,7 @@ module.exports = {
 
   async getProfileInfo(user_id) {
     const [userRows] = await db.query(
-      `SELECT user_id, user_name, profile_image, created_at
+      `SELECT user_id, user_name, profile_image, intro, created_at
        FROM users
        WHERE user_id = ?`,
       [user_id]
@@ -98,5 +99,52 @@ module.exports = {
        [user_id]
     );
     return rows;
+  },
+
+  async updateUserProfile(user_id, user_name = null, intro = null, profile_image = null) {
+    let sql = `UPDATE users SET `;
+    let params = [];
+    let updateFields = [];
+
+    // 이름 수정
+    if (user_name !== null) {
+      updateFields.push(`user_name = ?`);
+      params.push(user_name);
+    }
+
+    // 소개 수정
+    if (intro !== null) {
+      updateFields.push(`intro = ?`);
+      params.push(intro);
+    }
+
+    // 프로필 이미지 수정
+    if (profile_image !== null) {
+      updateFields.push(`profile_image = ?`);
+      params.push(profile_image);
+    }
+
+    // 업데이트할 항목이 없다면 종료
+    if (updateFields.length === 0) return false;
+
+    sql += updateFields.join(", ") + ` WHERE user_id = ?`;
+    params.push(user_id);
+
+    const [result] = await db.query(sql, params);
+    return result.affectedRows > 0;
+  },
+
+  async isUsernameTaken(user_name, exclude_user_id = null) {
+  let sql = `SELECT user_id FROM users WHERE user_name = ?`;
+  let params = [user_name];
+
+  // 본인 계정 제외 (본인 이름 그대로 저장할 때 오류 방지)
+  if (exclude_user_id !== null) {
+    sql += ` AND user_id != ?`;
+    params.push(exclude_user_id);
   }
+
+  const [rows] = await db.query(sql, params);
+  return rows.length > 0; // 중복 있음 → true
+}
 };

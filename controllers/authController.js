@@ -98,3 +98,37 @@ exports.getUserProfile = async (req, res) => {
     return res.status(500).json({ error: "프로필 정보를 불러오지 못했습니다." });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { user_name, intro } = req.body;
+    const user_id = req.user.user_id;
+
+    // 이름을 변경하려는 경우에만 중복 체크
+    if (user_name) {
+      const taken = await userModel.isUsernameTaken(user_name, user_id);
+      if (taken) {
+        return res.status(400).json({ message: "이미 사용 중인 사용자명입니다." });
+      }
+    }
+
+    const profile_image = req.file ? req.file.filename : null;
+
+    const success = await userModel.updateUserProfile(
+      user_id,
+      user_name,
+      intro,
+      profile_image
+    );
+
+    if (!success) {
+      return res.status(400).json({ message: "프로필 업데이트 실패" });
+    }
+
+    res.json({ message: "프로필 업데이트 완료" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "서버 오류" });
+  }
+};

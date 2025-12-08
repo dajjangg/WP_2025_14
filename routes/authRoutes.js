@@ -13,9 +13,15 @@ router.get("/:user_id/profile", authController.getUserProfile);
 //로그인 했는지 아닌지 체크
 router.get("/status", (req, res) => {
   if (req.isAuthenticated()) {
-    res.json({ loggedIn: true, user_id: req.user.user_id, user_name: req.user.user_name});
-    res.json({ loggedIn: false });
+    return res.json({
+      loggedIn: true,
+      user_id: req.user.user_id,
+      user_name: req.user.user_name
+    });
   }
+
+  return res.json({ loggedIn: false });
 });
+
 
 module.exports = router;

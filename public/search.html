@@ -183,6 +183,60 @@
     .like-btn span, .scrap-btn span {
       font-weight: bold;
     }
+
+    /* 모달 스타일 */
+      #modal {
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none; justify-content: center; align-items: center;
+        overflow-y: auto;
+        padding: 40px 0;
+      }
+
+      #modal-content {
+        width: 450px; max-height: 90vh; overflow-y: auto; background: white; padding: 20px; border-radius: 10px; margin-top: 50px;
+      }
+      #modal-content button {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      #modal-content button:hover {
+        background: #eee;
+      }
+      #modal img { width: 100%; border-radius: 6px; }
+      #comments { margin-top: 15px; max-height: 200px; overflow-y: auto; }
+      .comment { padding: 5px; border-bottom: 1px solid #eee; }
+      .info-label { font-weight: bold; margin-top: 10px; }
+      .tags span {
+        margin-right: 5px;
+        color: #0077cc;
+        font-weight: bold;
+      }
+      .tag-item {
+        display: inline-block;
+        background: #f0f7ff;
+        color: #1a73e8;
+        padding: 4px 10px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .tag-item:hover {
+        background: #dbe9ff;
+        transform: translateY(-2px);
+      }
+
   </style>
 </head>
 
@@ -200,7 +254,7 @@
   <div class="search-wrapper">
     <!-- 검색창 -->
     <div class="search-bar">
-      <input class="search-input" type="text" id="tagInput" placeholder="검색할 태그를 입력하세요. (예: 부산, 카페)" />
+      <input class="search-input" type="text" id="tagInput" placeholder="검색할 태그를 입력하세요. 여러 개 입력 시 공백으로 구분 (예: 부산 카페)" />
       <button class="search-btn" onclick="searchTags()">➜</button>
     </div>
 
@@ -214,9 +268,42 @@
   </div>
 
   <script>
+    let loggedInUserId = null;
+
+    async function checkLoginStatus() {
+      try {
+        const res = await fetch("/auth/status", {
+          credentials: "include" // 세션 쿠키 포함
+        });
+
+        const data = await res.json();
+
+        if (data.loggedIn) {
+          loggedInUserId = data.user_id;
+        }
+      } catch (err) {
+        console.error("로그인 상태 확인 실패", err);
+      }
+    }
+
+    checkLoginStatus();
     function goHome() { window.location.href = "/index.html"; }
-    function goUpload() { window.location.href = "/upload.html"; }
-    function goProfile() { window.location.href = "/profile.html"; }
+    function goUpload() { 
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 서비스입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+        window.location.href = "/upload.html"; 
+      }
+    function goProfile() {
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 서비스입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+        window.location.href = `/profile.html?user_id=${loggedInUserId}`;
+      }
 
     async function searchTags() {
       const keyword = document.getElementById("tagInput").value.trim();
@@ -237,30 +324,51 @@
 
         if (!posts.length) {
           placeholder.style.display = "block";
+          placeholder.innerHTML = `❌ 검색한 태그를 포함하는 게시물이 존재하지 않습니다.`;
           return;
         }
+
 
         placeholder.style.display = "none";
 
         // 결과 렌더링
         posts.forEach(post => {
-          const card = `
-            <div class="card">
-              <img src="${post.image_path}" alt="post image" />
-              <div class="card-title">${post.caption || "(제목 없음)"}</div>
-              <div class="card-tags">#${post.tags ? post.tags.replace(/,/g, " #") : ""}</div>
-              <div class="card-user">작성자: ${post.user_name}</div>
-              <div class="card-meta">
-                <button class="like-btn" onclick="toggleLike(${post.post_id}, event)">
-                  ❤️ <span id="like-${post.post_id}">${post.likes_count}</span>
-                </button>
-                <button class="scrap-btn" onclick="toggleScrap(${post.post_id}, event)">
-                  ⭐ <span id="scrap-${post.post_id}">${post.scraps_count}</span>
-                </button>
-              </div>
+          // 1) DOM 요소 생성
+          const card = document.createElement("div");
+          card.className = "card";
+          let tags = typeof post.tags === "string"
+          ? post.tags.split(",").filter(t => t.trim() !== "")
+          : [];
+
+          // HTML 태그 문자열 생성
+          let tagHtml = tags
+          .map(t => `<span class="tag-item" onclick="searchByTag('${t}')">#${t}</span>`)
+          .join("");
+
+          // 2) 내부 HTML 삽입
+          card.innerHTML = `
+            <img src="${post.image_path}" alt="post image" />
+            <div class="card-title">${post.caption || "(제목 없음)"}</div>
+            <div class="card-tags">${tagHtml}</div>
+            <div class="card-user">작성자: ${post.user_name}</div>
+
+            <div class="card-meta">
+              <button class="like-btn" onclick="toggleLike(${post.post_id}, event)">
+                ❤️ <span id="like-${post.post_id}">${post.likes_count}</span>
+              </button>
+              <button class="scrap-btn" onclick="toggleScrap(${post.post_id}, event)">
+                ⭐ <span id="scrap-${post.post_id}">${post.scraps_count}</span>
+              </button>
+            </div>
           `;
-          grid.innerHTML += card;
+
+          // 3) 카드 클릭 시 모달 열기
+          card.addEventListener("click", () => openModal(post));
+
+          // 4) 그리드에 추가
+          grid.appendChild(card);
         });
+
       } catch (err) {
         console.error("검색 오류:", err);
         placeholder.style.display = "block";
@@ -289,6 +397,126 @@
       const countData = await countRes.json();
       document.getElementById(`scrap-${post_id}`).innerText = countData.scrapCount;
     }
+
+    function openModal(post) {
+      document.getElementById("modal").style.display = "flex";
+      document.getElementById("modal-img").src = `/${post.image_path}`;
+      document.getElementById("modal-caption").textContent = post.caption;
+      document.getElementById("modal-description").textContent = post.description ?? "";
+      document.getElementById("modal-category").textContent = post.category ?? "없음";
+      document.getElementById("modal-user").textContent = post.user_name;
+      
+      const date = new Date(post.created_at).toLocaleString();
+      document.getElementById("modal-date").textContent = date;
+
+      document.getElementById("modal-likes").textContent = post.likes_count ?? 0;
+      document.getElementById("modal-scraps").textContent = post.scraps_count ?? 0;
+
+      let tags = typeof post.tags === "string"
+        ? post.tags.split(",").filter(t => t.trim() !== "")
+        : [];
+      let tagHtml = tags
+      .map(t => `<span class="tag-item" onclick="searchByTag('${t}')">#${t}</span>`)
+      .join("");
+      document.getElementById("modal-tags").innerHTML = tagHtml;
+
+      loadComments(post.post_id);
+
+      document.getElementById("commentBtn").onclick = () => addComment(post.post_id);
+    }
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+    async function loadComments(post_id) {
+      const res = await fetch(`/comment/${post_id}`);
+      const comments = await res.json();
+
+      const commentsDiv = document.getElementById("comments");
+      commentsDiv.innerHTML = "";
+
+      comments.forEach(c => {
+        commentsDiv.innerHTML += `
+          <div class="comment">
+            <b>${c.user_name}</b>: ${c.comment}
+          </div>
+        `;
+      });
+    }
+    async function searchByTag(tag) {
+      event.stopPropagation();   // 카드 클릭 이벤트로 전파 막기!
+
+      const input = document.getElementById("tagInput");
+      input.value = tag;
+      searchTags();     // 검색 실행
+    }
+
+    async function addComment(post_id) {
+      const input = document.getElementById("commentInput");
+      const text = input.value.trim();
+      if (text === "") return;
+
+      const res = await fetch(`/comment/${post_id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment: text })
+      });
+
+      const data = await res.json();
+      if (data.message) {
+        input.value = "";
+        loadComments(post_id);
+      }
+    }
+
   </script>
+  <!-- 모달 -->
+  <div id="modal" style="
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none; justify-content: center; align-items: center;
+    overflow-y: auto; padding: 40px 0;
+  ">
+    <div id="modal-content" style="
+      width: 450px; max-height: 90vh; overflow-y: auto;
+      background: white; padding: 20px; border-radius: 10px;
+    ">
+      <button onclick="closeModal()">닫기</button>
+
+      <img id="modal-img" src="" />
+
+      <p class="info-label">👤 작성자</p>
+      <p id="modal-user"></p>
+
+      <p class="info-label">📅 작성일</p>
+      <p id="modal-date"></p>
+
+      <p class="info-label">✏️ 캡션</p>
+      <p id="modal-caption"></p>
+
+      <p class="info-label">📝 설명</p>
+      <p id="modal-description"></p>
+
+      <p class="info-label">🏷 태그</p>
+      <p id="modal-tags"></p>
+
+      <p class="info-label">🍽 카테고리</p>
+      <p id="modal-category"></p>
+
+      <p class="info-label">❤️ 좋아요 수</p>
+      <p id="modal-likes"></p>
+
+      <p class="info-label">⭐ 스크랩 수</p>
+      <p id="modal-scraps"></p>
+
+      <h3>댓글</h3>
+      <div id="comments"></div>
+
+      <h4>댓글 작성</h4>
+      <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
+      <button id="commentBtn">등록</button>
+    </div>
+  </div>
+
 </body>
 </html>

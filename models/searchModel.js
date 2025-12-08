@@ -16,7 +16,11 @@ module.exports = {
         p.scraps_count,
         p.created_at,
         u.user_name,
-        GROUP_CONCAT(t.tag_name) AS tags,
+        (SELECT GROUP_CONCAT(t2.tag_name)
+         FROM post_tags pt2
+         JOIN tags t2 ON pt2.tag_id = t2.tag_id
+         WHERE pt2.post_id = p.post_id
+        ) AS tags,
         COUNT(*) AS match_count
       FROM posts p
       JOIN post_tags pt ON p.post_id = pt.post_id

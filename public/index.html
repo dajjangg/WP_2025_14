@@ -417,8 +417,20 @@
       let selectedSort = "newest"; // 기본값: 최신순
 
       function goLogin() { window.location.href = "/login.html"; }
-      function goUpload() { window.location.href = "/upload.html"; }
+      function goUpload() { 
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 서비스입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+        window.location.href = "/upload.html"; 
+      }
       function goProfile() {
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 서비스입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
         window.location.href = `/profile.html?user_id=${loggedInUserId}`;
       }
       function goSearch() { window.location.href = "/search.html"; }
@@ -442,7 +454,9 @@
       // 로그인 상태 확인
       async function checkLoginStatus() {
         try {
-          const res = await fetch("/auth/status");
+          const res = await fetch("/auth/status", {
+            credentials: "include"
+          });
           const data = await res.json();
 
           if (data.loggedIn) {
