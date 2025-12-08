@@ -467,6 +467,15 @@
         loadComments(post_id);
       }
     }
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const tag = params.get("tag");
+
+      if (tag) {
+        document.getElementById("tagInput").value = tag;
+        searchTags();  // 자동 검색 실행
+      }
+    };
 
   </script>
   <!-- 모달 -->

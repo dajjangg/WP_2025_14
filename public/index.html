@@ -293,6 +293,24 @@
         color: #0077cc;
         font-weight: bold;
       }
+      .tag-item {
+        display: inline-block;
+        background: #f0f7ff;
+        color: #1a73e8;
+        padding: 4px 10px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .tag-item:hover {
+        background: #dbe9ff;
+        transform: translateY(-2px);
+      }
     </style>
   </head>
   <body>
@@ -410,6 +428,11 @@
     </div>
 
     <script>
+      function searchByTag(tag, event) {
+        event.stopPropagation();  // 모달 클릭 막기
+        // 검색 페이지로 이동하면서 태그 전달
+        window.location.href = `/search.html?tag=${encodeURIComponent(tag)}`;
+      }
       let allPosts = [];
       let selectedCategory = "전체";
       let selectedYear = "전체";
@@ -727,7 +750,7 @@
         ? post.tags.split(" ").filter(t => t.trim() !== "")
         : [];
 
-        const tagHtml = tags.map(t => `<span>#${t}</span>`).join(" ");
+        const tagHtml = tags.map(t => `<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
         document.getElementById("modal-tags").innerHTML = tagHtml;
 
         // 댓글 불러오기
