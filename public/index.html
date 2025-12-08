@@ -213,6 +213,12 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
 
+      .card-user {
+        font-size: 12px; /* 글자 더 작게 */
+        color: #555;
+        margin-top: 4px;
+      }
+
       .photo-card img {
         width: 100%;
         height : 200px;
@@ -231,15 +237,15 @@
         border: none;
         background: #fff;
         cursor: pointer;
-        font-size: 14px;
-        padding: 6px 10px;
-        margin: 2 0px;
-        border-radius: 20px;
+        font-size: 12px;
+        padding: 4px 5px;
+        margin: 4px 0px;
+        border-radius: 14px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
       }
 
       .like-btn:hover {
@@ -270,7 +276,8 @@
       }
 
       #modal-content {
-        width: 450px; max-height: 90vh; overflow-y: auto; background: white; padding: 20px; border-radius: 10px; margin-top: 50px;
+        width: 450px; max-height: 90vh; overflow-y: auto; background: white; 
+        padding: 20px; border-radius: 10px; margin-top: 50px;
       }
       #modal-content button {
         padding: 6px 10px;
@@ -311,6 +318,16 @@
         background: #dbe9ff;
         transform: translateY(-2px);
       }
+      .like-btn.active {
+        background: #ffe5e5;
+        color: #e74c3c;
+      }
+
+      .scrap-btn.active {
+        background: #fff4c2;
+        color: #f1c40f;
+      }
+      
     </style>
   </head>
   <body>
@@ -412,11 +429,10 @@
         <p class="info-label">🍽 카테고리</p>
         <p id="modal-category"></p>
 
-        <p class="info-label">❤️ 좋아요 수</p>
-        <p id="modal-likes"></p>
-
-        <p class="info-label">⭐ 스크랩 수</p>
-        <p id="modal-scraps"></p>
+        <div class="modal-actions" style="margin-top: 10px; display:flex; gap:10px;">
+          <button id="modal-like-btn" class="like-btn">❤️ <span id="modal-like-count"></span></button>
+          <button id="modal-scrap-btn" class="scrap-btn">⭐ <span id="modal-scrap-count"></span></button>
+        </div>
 
         <h3>댓글</h3>
         <div id="comments"></div>
@@ -493,7 +509,9 @@
       }
 
       async function loadPosts() {
-        const res = await fetch("/post/");
+        const res = await fetch("/post/", {
+          credentials: "include"
+        });
         allPosts = await res.json();
         renderGallery(allPosts);
       }
@@ -511,10 +529,10 @@
             <div class="caption">${post.caption ?? "(캡션 없음)"}</div>
             <div class="card-user">작성자: ${post.user_name}</div>
             <div class="card-meta">
-              <button class="like-btn" onclick="toggleLike(${post.post_id}, event)">
+              <button class="like-btn ${post.liked ? "active" : ""}" onclick="toggleLike(${post.post_id}, event)">
                 ❤️ <span id="like-${post.post_id}">${post.likes_count}</span>
               </button>
-              <button class="scrap-btn" onclick="toggleScrap(${post.post_id}, event)">
+              <button class="scrap-btn ${post.scrapped ? "active" : ""}" onclick="toggleScrap(${post.post_id}, event)">
                 ⭐ <span id="scrap-${post.post_id}">${post.scraps_count}</span>
               </button>
             </div>
@@ -527,25 +545,70 @@
 
       async function toggleLike(post_id, event) {
         event.stopPropagation(); // 카드 클릭 이벤트로 전파 막기
-        const res = await fetch(`/like/${post_id}`, { method: "POST" });
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 기능입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+        const btn = event.currentTarget;
+        const res = await fetch(`/like/${post_id}`, { 
+          method: "POST", 
+          credentials: "include"
+        });
         const data = await res.json();
         console.log(data);
+        btn.classList.toggle("active", data.liked);
 
         const countRes = await fetch(`/like/${post_id}/count`);
         const countData = await countRes.json();
-        document.getElementById(`like-${post_id}`).innerText = countData.likeCount;
+        const modalLike = document.querySelector(`#modal-like-${post_id}`);
+        if (modalLike) modalLike.innerText = countData.likeCount;
+        const listBtn = document.querySelector(`.like-btn[data-post-id="${post_id}"]`);
+        const listCount = document.querySelector(`#like-${post_id}`);
+        if (listBtn) listBtn.classList.toggle("active", data.liked);
+        if (listCount) listCount.innerText = countData.likeCount;
+
+        const target = allPosts.find(p => p.post_id === post_id);
+          if (target) {
+            target.liked = data.liked;
+            target.likes_count = countData.likeCount;
+        }
       }
 
       async function toggleScrap(post_id, event) {
         event.stopPropagation(); // 카드 클릭 이벤트로 전파 막기
-        const res = await fetch(`/scrap/${post_id}`, { method: "POST" });
+        if (!loggedInUserId) {
+          alert("로그인이 필요한 기능입니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+
+        const res = await fetch(`/scrap/${post_id}`, { 
+          method: "POST", 
+          credentials: "include"
+        });
         const data = await res.json();
         console.log(data);
 
+        const btn = event.currentTarget;
+        btn.classList.toggle("active", data.scrapped);
+
         const countRes = await fetch(`/scrap/${post_id}/count`);
         const countData = await countRes.json();
-        document.getElementById(`scrap-${post_id}`).innerText = countData.scrapCount;
-      }
+        
+        const modalScrap = document.querySelector(`#modal-scrap-${post_id}`);
+        if (modalScrap) modalScrap.innerText = countData.scrapCount;
+        const listScrapBtn = document.querySelector(`.scrap-btn[data-post-id="${post_id}"]`);
+        const listScrapCount = document.querySelector(`#scrap-${post_id}`);
+        if (listScrapBtn) listScrapBtn.classList.toggle("active", data.scrapped);
+        if (listScrapCount) listScrapCount.innerText = countData.scrapCount;
+        
+        const target = allPosts.find(p => p.post_id === post_id);
+          if (target) {
+            target.scrapped = data.scrapped;
+            target.scraps_count = countData.scrapCount;
+          }
+        }
 
       function resetFilters() {
         selectedCategory = "전체";
@@ -744,8 +807,19 @@
         document.getElementById("modal-user").textContent = post.user_name;
         const date = new Date(post.created_at).toLocaleString();
         document.getElementById("modal-date").textContent = date;
-        document.getElementById("modal-likes").textContent = post.likes_count ?? 0;
-        document.getElementById("modal-scraps").textContent = post.scraps_count ?? 0;
+        // 좋아요 / 스크랩 버튼 상태 반영
+          const modalLikeBtn = document.getElementById("modal-like-btn");
+          const modalScrapBtn = document.getElementById("modal-scrap-btn");
+
+          modalLikeBtn.classList.toggle("active", post.liked);
+          modalScrapBtn.classList.toggle("active", post.scrapped);
+
+          document.getElementById("modal-like-count").textContent = post.likes_count;
+          document.getElementById("modal-scrap-count").textContent = post.scraps_count;
+
+          // 버튼 클릭 이벤트 설정
+          modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
+          modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
         const tags = typeof post.tags === "string"
         ? post.tags.split(" ").filter(t => t.trim() !== "")
         : [];
@@ -765,7 +839,67 @@
       function closeModal() {
         document.getElementById("modal").style.display = "none";
       }
+      async function toggleLikeInModal(post, event) {
+        event.stopPropagation();
+        if (!loggedInUserId) {
+          alert("로그인이 필요합니다.");
+          window.location.href = "/login.html";
+          return;
+        }
 
+        const btn = document.getElementById("modal-like-btn");
+        const res = await fetch(`/like/${post.post_id}`, {
+          method: "POST",
+          credentials: "include"
+        });
+        const data = await res.json();
+
+        // 버튼 색 변경
+        btn.classList.toggle("active", data.liked);
+
+        // 최신 카운트 가져오기
+        const countRes = await fetch(`/like/${post.post_id}/count`);
+        const countData = await countRes.json();
+        document.getElementById("modal-like-count").textContent = countData.likeCount;
+
+        // 카드에서도 즉시 반영
+        document.getElementById(`like-${post.post_id}`).textContent = countData.likeCount;
+
+        // allPosts 배열 업데이트
+        post.liked = data.liked;
+        post.likes_count = countData.likeCount;
+      }
+
+      async function toggleScrapInModal(post, event) {
+        event.stopPropagation();
+        if (!loggedInUserId) {
+          alert("로그인이 필요합니다.");
+          window.location.href = "/login.html";
+          return;
+        }
+
+        const btn = document.getElementById("modal-scrap-btn");
+        const res = await fetch(`/scrap/${post.post_id}`, {
+          method: "POST",
+          credentials: "include"
+        });
+        const data = await res.json();
+
+        // 버튼 색 변경
+        btn.classList.toggle("active", data.scrapped);
+
+        // 최신 카운트 가져오기
+        const countRes = await fetch(`/scrap/${post.post_id}/count`);
+        const countData = await countRes.json();
+        document.getElementById("modal-scrap-count").textContent = countData.scrapCount;
+
+        // 카드에서도 즉시 반영
+        document.getElementById(`scrap-${post.post_id}`).textContent = countData.scrapCount;
+
+        // allPosts 배열 업데이트
+        post.scrapped = data.scrapped;
+        post.scraps_count = countData.scrapCount;
+      }
       // 댓글 불러오기
       async function loadComments(post_id) {
         const res = await fetch(`/comment/${post_id}`);
@@ -801,9 +935,12 @@
           loadComments(post_id); // 댓글 즉시 새로고침
         }
       }
+      async function init() {
+        await checkLoginStatus(); // 로그인 먼저 정확히 확인
+        await loadPosts();        // 그 다음 게시물 로드
+      }
 
-      checkLoginStatus();
-      loadPosts();
+      init(); 
     </script>
   </body>
   </html>

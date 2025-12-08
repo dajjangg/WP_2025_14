@@ -55,8 +55,11 @@ exports.uploadPost = async (req, res) => {
 
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await postModel.getAllPosts();
-    return res.json(posts);
+    // Passport 로그인 한 경우
+    const user_id = req.isAuthenticated() ? req.user.user_id : null;
+
+    const posts = await postModel.getAllPosts(user_id);
+    res.json(posts);
   } catch (err) {
     res.status(500).json({ error: "불러오기 실패" });
   }
