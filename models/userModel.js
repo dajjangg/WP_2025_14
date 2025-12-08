@@ -90,13 +90,28 @@ module.exports = {
 
   async getScrappedPosts(user_id) {
     const [rows] = await db.query(
-      `SELECT p.*, s.created_at AS scrap_time, u.user_name
-       FROM scraps s
-       JOIN posts p ON s.post_id = p.post_id
-       JOIN users u ON p.user_id = u.user_id
-       WHERE s.user_id = ?
-       ORDER BY s.created_at DESC`,
-       [user_id]
+      `SELECT
+        p.post_id,
+        p.user_id,
+        p.image_path,
+        p.caption,
+        p.description,
+        p.category,
+        p.likes_count,
+        p.scraps_count,
+        p.created_at,
+        u.user_name,
+        s.created_at AS scrap_time,
+        GROUP_CONCAT(t.tag_name SEPARATOR ' ') AS tags
+      FROM scraps s
+      JOIN posts p ON s.post_id = p.post_id
+      JOIN users u ON p.user_id = u.user_id
+      LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.tag_id
+      WHERE s.user_id = ?
+      GROUP BY p.post_id
+      ORDER BY s.created_at DESC`,
+      [user_id]
     );
     return rows;
   },
