@@ -1,4 +1,6 @@
 const db = require("../config/db");
+const likeModel = require("./likeModel");
+const scrapModel = require("./scrapModel");
 
 module.exports = {
   async createPost(user_id, image_path, caption, description, category) {
@@ -9,28 +11,38 @@ module.exports = {
     return result.insertId;
   },
 
-  async getAllPosts() {
-  const [rows] = await db.query(`
-    SELECT 
-      p.post_id,
-      p.user_id,
-      p.image_path,
-      p.caption,
-      p.description,
-      p.category,
-      p.likes_count,
-      p.scraps_count,
-      p.created_at,
-      u.user_name,
-      GROUP_CONCAT(t.tag_name SEPARATOR ' ') AS tags
-    FROM posts p
-    JOIN users u ON p.user_id = u.user_id
-    LEFT JOIN post_tags pt ON p.post_id = pt.post_id
-    LEFT JOIN tags t ON pt.tag_id = t.tag_id
-    GROUP BY p.post_id
-    ORDER BY p.created_at DESC
-  `);
-  return rows;
+  async getAllPosts(user_id) {
+    const [posts] = await db.query(`
+      SELECT 
+        p.post_id,
+        p.user_id,
+        p.image_path,
+        p.caption,
+        p.description,
+        p.category,
+        p.likes_count,
+        p.scraps_count,
+        p.created_at,
+        u.user_name,
+        GROUP_CONCAT(t.tag_name SEPARATOR ' ') AS tags
+      FROM posts p
+      JOIN users u ON p.user_id = u.user_id
+      LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.tag_id
+      GROUP BY p.post_id
+      ORDER BY p.created_at DESC
+    `);
+    for (const post of posts) {
+      if (user_id) {
+        post.liked = await likeModel.hasUserLiked(post.post_id, user_id);
+        post.scrapped = await scrapModel.hasUserScrapped(post.post_id, user_id);
+      } else {
+        post.liked = false;
+        post.scrapped = false;
+      }
+
+    }
+    return posts;
   },
 
   async getAll() {
