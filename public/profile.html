@@ -85,7 +85,7 @@
     }
 
     /* 닉네임 */
-    .nickname {
+    .nickname-container {
       text-align: center;
       font-size: 22px;
       font-weight: bold;
@@ -93,12 +93,33 @@
     }
 
     /* 소개 */
-    .intro {
+    .intro-container {
       text-align: center;
       font-size: 14px;
       color: #666;
       margin-top: 5px;
       margin-bottom: 20px;
+    }
+
+    .edit-btn {
+      border: none;
+      background: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 5px;
+      margin: 4px 10px;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .edit-btn:hover {
+      background: #ffe5e5;
+      color: #e74c3c; /* 빨간색 */
+      transform: scale(1.05);
     }
 
     /* 탭 메뉴 */
@@ -224,6 +245,65 @@
         background: #dbe9ff;
         transform: translateY(-2px);
       }
+
+      /* 닉네임 모달 배경 */
+      /* -------------------- 닉네임/인트로 모달 (중앙) -------------------- */
+      .modal {
+        display: none; /* 기본 숨김 */
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4); /* 반투명 배경 */
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+      }
+
+      /* 모달 박스 */
+      .modal .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        animation: fadeIn 0.3s ease;
+      }
+
+      /* 입력창 */
+      .modal input {
+        width: 90%;
+        padding: 8px;
+        margin: 12px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+      /* 버튼 */
+      .modal-buttons button {
+        margin: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .modal-buttons #nickname-save,
+      .modal-buttons #intro-save {
+        background: #4CAF50;
+        color: white;
+      }
+
+      .modal-buttons #nickname-cancel,
+      .modal-buttons #intro-cancel {
+        background: #f44336;
+        color: white;
+      }
+
+      /* 애니메이션 */
+      @keyframes fadeIn {
+        from {opacity: 0; transform: scale(0.9);}
+        to {opacity: 1; transform: scale(1);}
+      }
   </style>
 </head>
 <body>
@@ -241,14 +321,22 @@
     
       <!-- 프로필 사진 -->
       <div class="profile-image">
-        <img src="" alt="프로필 이미지">
+        <img src="https://via.placeholder.com/150" alt="프로필 이미지">
+        <!-- 숨겨진 파일 입력-->
+        <input type="file" id="profileUpload" accept="image/*" style="display:none;">
       </div>
 
       <!-- 닉네임 -->
-      <div class="nickname"></div>
+      <div class="nickname-container">
+        <span class="nickname"></span>
+        <button class="edit-btn" id="edit-nickname-btn">✏️</button>
+      </div>
 
       <!-- 한 줄 소개 -->
-      <div class="intro"></div>
+      <div class="intro-container">
+        <span class="intro"></span>
+        <button class="edit-btn" id="edit-intro-btn">✏️</button>
+      </div>
 
       <!-- 탭 -->
       <div class="tabs">
@@ -269,6 +357,10 @@
       }
     function goUpload() { window.location.href = "/upload.html"; }
 
+    //사진 수정용
+    const profileImg = document.querySelector(".profile-image img");
+    const profileUpload = document.getElementById("profileUpload");
+
     const params = new URLSearchParams(window.location.search);
     const userId = params.get("user_id");
     const tabMyPosts = document.getElementById("tab-my-posts");
@@ -288,7 +380,7 @@
 
       document.querySelector(".profile-image img").src = data.user.profile_image
           ? `/${data.user.profile_image}`
-          : "https://via.placeholder.com/150";
+          : "uploads/test_cat_1764579098971.jpg";
 
       // 게시물 데이터 저장
       myPosts = data.posts;
@@ -297,6 +389,120 @@
       renderPosts(myPosts);
     }
 
+    // 프로필 사진 수정
+    profileImg.addEventListener("click", () => {
+      profileUpload.click();
+    });
+
+    profileUpload.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 확인창 띄우기
+      const confirmChange = window.confirm("선택한 사진으로 프로필을 변경하시겠습니까?");
+      if (!confirmChange) {
+        return; // 취소하면 아무 동작 안 함
+      }
+
+      const formData = new FormData();
+      formData.append("profile_image", file);
+
+      const res = await fetch(`/auth/${userId}/profile/image`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        profileImg.src = `/${data.new_image_path}`;
+      } else {
+        alert("프로필 사진 업로드 실패");
+      }
+    });
+
+    //닉네임, intro 수정
+    const editNicknameBtn = document.getElementById("edit-nickname-btn");
+    const editIntroBtn = document.getElementById("edit-intro-btn");
+
+    function showNicknameModal(currentName) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("nickname-modal");
+        const input = document.getElementById("nickname-input");
+        const saveBtn = document.getElementById("nickname-save");
+        const cancelBtn = document.getElementById("nickname-cancel");
+
+        input.value = currentName;
+        modal.style.display = "flex";
+
+        saveBtn.onclick = () => {
+          modal.style.display = "none";
+          resolve(input.value.trim());
+        };
+        cancelBtn.onclick = () => {
+          modal.style.display = "none";
+          resolve(null);
+        };
+      });
+    }
+
+    editNicknameBtn.addEventListener("click", async () => {
+      const currentName = document.querySelector(".nickname").textContent;
+      const newName = await showNicknameModal(currentName);
+      if (!newName) return;
+
+      const res = await fetch(`/auth/${userId}/profile/username`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_name: newName })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        document.querySelector(".nickname").textContent = data.new_user_name;
+      } else {
+        alert(data.message || "닉네임 수정 실패");
+      }
+    });
+
+    function showIntroModal(currentIntro) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("intro-modal");
+        const input = document.getElementById("intro-input");
+        const saveBtn = document.getElementById("intro-save");
+        const cancelBtn = document.getElementById("intro-cancel");
+
+        input.value = currentIntro;
+        modal.style.display = "flex"; // 중앙 모달 띄우기
+
+        saveBtn.onclick = () => {
+          modal.style.display = "none";
+          resolve(input.value.trim());
+        };
+        cancelBtn.onclick = () => {
+          modal.style.display = "none";
+          resolve(null);
+        };
+      });
+    }
+
+    editIntroBtn.addEventListener("click", async () => {
+      const currentIntro = document.querySelector(".intro").textContent;
+      const newIntro = await showIntroModal(currentIntro);
+      if (!newIntro) return;
+
+      const res = await fetch(`/auth/${userId}/profile/intro`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intro: newIntro })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        document.querySelector(".intro").textContent = data.new_intro;
+      } else {
+        alert(data.message || "한 줄 소개 수정 실패");
+      }
+    });
 
     // 탭 클릭 이벤트
     tabMyPosts.addEventListener("click", () => {
@@ -442,6 +648,29 @@
         <button id="commentBtn">등록</button>
       </div>
     </div>
+
+  <!-- 닉네임 수정 모달 -->
+  <div id="nickname-modal" class="modal">
+    <div class="modal-content">
+      <h3>새 닉네임 입력</h3>
+      <input type="text" id="nickname-input" />
+      <div class="modal-buttons">
+        <button id="nickname-save">저장</button>
+        <button id="nickname-cancel">취소</button>
+      </div>
+    </div>
   </div>
+  <!-- intro 수정 모달 -->
+  <div id="intro-modal" class="modal">
+    <div class="modal-content">
+      <h3>한 줄 소개 수정</h3>
+      <input type="text" id="intro-input" />
+      <div class="modal-buttons">
+        <button id="intro-save">저장</button>
+        <button id="intro-cancel">취소</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

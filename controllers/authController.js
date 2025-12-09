@@ -1,6 +1,11 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const userModel = require("../models/userModel");
+const path = require("path");
+// multer 같은 미들웨어를 써서 파일 저장
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
 
 exports.register = async (req, res) => {
   const { user_name, password } = req.body;
@@ -130,5 +135,81 @@ exports.updateProfile = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "서버 오류" });
+  }
+};
+
+exports.updateProfileImage = [
+  upload.single("profile_image"), // formData에서 profile_image 필드 받음
+  async (req, res) => {
+    try {
+      const userId = req.params.user_id;
+      if (!req.file) {
+        return res.status(400).json({ message: "파일이 업로드되지 않았습니다." });
+      }
+
+      // 파일 경로 저장 (예: uploads/파일명)
+      const newImagePath = path.join("uploads", req.file.filename);
+
+      // DB 업데이트
+      await userModel.updateProfileImage(userId, newImagePath);
+
+      return res.json({
+        success: true,
+        new_image_path: newImagePath
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "프로필 이미지 업데이트 실패" });
+    }
+  }
+];
+
+// 닉네임 수정 컨트롤러
+exports.updateUserName = async (req, res) => {
+  try {
+    const userId = req.params.user_id;
+    const { user_name } = req.body;
+
+    if (!user_name) {
+      return res.status(400).json({ message: "새 닉네임을 입력하세요." });
+    }
+
+    // 중복 체크
+    const taken = await userModel.isUsernameTaken(user_name, userId);
+    if (taken) {
+      return res.status(400).json({ message: "이미 사용 중인 사용자명입니다." });
+    }
+
+    const success = await userModel.updateUserName(userId, user_name);
+    if (!success) {
+      return res.status(400).json({ message: "닉네임 수정 실패" });
+    }
+
+    res.json({ success: true, new_user_name: user_name });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "닉네임 수정 중 서버 오류" });
+  }
+};
+
+// 한 줄 소개 수정 컨트롤러
+exports.updateIntro = async (req, res) => {
+  try {
+    const userId = req.params.user_id;
+    const { intro } = req.body;
+
+    if (!intro) {
+      return res.status(400).json({ message: "새 소개를 입력하세요." });
+    }
+
+    const success = await userModel.updateIntro(userId, intro);
+    if (!success) {
+      return res.status(400).json({ message: "소개 수정 실패" });
+    }
+
+    res.json({ success: true, new_intro: intro });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "소개 수정 중 서버 오류" });
   }
 };
