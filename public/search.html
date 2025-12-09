@@ -190,6 +190,16 @@
       font-weight: bold;
     }
 
+    .like-btn.active {
+      background: #ffe5e5;
+      color: #e74c3c;
+    }
+
+    .scrap-btn.active {
+      background: #fff4c2;
+      color: #f1c40f;
+    }
+
     /* 모달 스타일 */
       #modal {
         position: fixed; top: 0; left: 0;
@@ -274,6 +284,8 @@
   </div>
 
   <script>
+    let allPosts = [];
+
     let loggedInUserId = null;
 
     async function checkLoginStatus() {
@@ -359,10 +371,10 @@
             <div class="card-user">작성자: ${post.user_name}</div>
 
             <div class="card-meta">
-              <button class="like-btn" onclick="toggleLike(${post.post_id}, event)">
+              <button class="like-btn ${post.liked ? "active" : ""}" data-post-id="${post.post_id}" onclick="toggleLike(${post.post_id}, event)">
                 ❤️ <span id="like-${post.post_id}">${post.likes_count}</span>
               </button>
-              <button class="scrap-btn" onclick="toggleScrap(${post.post_id}, event)">
+              <button class="scrap-btn ${post.scrapped ? "active" : ""}" onclick="toggleScrap(${post.post_id}, event)">
                 ⭐ <span id="scrap-${post.post_id}">${post.scraps_count}</span>
               </button>
             </div>
@@ -384,24 +396,69 @@
 
     async function toggleLike(post_id, event) {
       event.stopPropagation(); // 카드 클릭 이벤트로 전파 막기
-      const res = await fetch(`/like/${post_id}`, { method: "POST" });
+      if (!loggedInUserId) {
+        alert("로그인이 필요한 기능입니다.");
+        window.location.href = "/login.html";
+        return;
+      }
+      const btn = event.currentTarget;
+      const res = await fetch(`/like/${post_id}`, {
+        method: "POST",
+        credentials: "include"
+      });
       const data = await res.json();
       console.log(data);
+      btn.classList.toggle("active", data.liked);
+      console.log(data.liked);
+
 
       const countRes = await fetch(`/like/${post_id}/count`);
       const countData = await countRes.json();
-      document.getElementById(`like-${post_id}`).innerText = countData.likeCount;
+      const modalLike = document.querySelector(`#modal-like-${post_id}`);
+      if (modalLike) modalLike.innerText = countData.likeCount;
+      const listBtn = document.querySelector(`.like-btn[data-post-id="${post_id}"]`);
+      const listCount = document.querySelector(`#like-${post_id}`);
+      if (listBtn) listBtn.classList.toggle("active", data.liked);
+      if (listCount) listCount.innerText = countData.likeCount;
+
+      const target = allPosts.find(p => p.post_id === post_id);
+        if (target) {
+          target.liked = data.liked;
+          target.likes_count = countData.likeCount;
+      }
     }
 
     async function toggleScrap(post_id, event) {
       event.stopPropagation(); // 카드 클릭 이벤트로 전파 막기
-      const res = await fetch(`/scrap/${post_id}`, { method: "POST" });
+      if (!loggedInUserId) {
+        alert("로그인이 필요한 기능입니다.");
+        window.location.href = "/login.html";
+        return;
+      }
+      const btn = event.currentTarget;
+      const res = await fetch(`/scrap/${post_id}`, {
+        method: "POST",
+        credentials: "include"
+      });
       const data = await res.json();
       console.log(data);
+      btn.classList.toggle("active", data.scrapped);
 
       const countRes = await fetch(`/scrap/${post_id}/count`);
       const countData = await countRes.json();
-      document.getElementById(`scrap-${post_id}`).innerText = countData.scrapCount;
+
+      const modalScrap = document.querySelector(`#modal-scrap-${post_id}`);
+      if (modalScrap) modalScrap.innerText = countData.scrapCount;
+      const listScrapBtn = document.querySelector(`.scrap-btn[data-post-id="${post_id}"]`);
+      const listScrapCount = document.querySelector(`#scrap-${post_id}`);
+      if (listScrapBtn) listScrapBtn.classList.toggle("active", data.scrapped);
+      if (listScrapCount) listScrapCount.innerText = countData.scrapCount;
+
+      const target = allPosts.find(p => p.post_id === post_id);
+      if (target) {
+        target.scrapped = data.scrapped;
+        target.scraps_count = countData.scrapCount;
+      }
     }
 
     function openModal(post) {
