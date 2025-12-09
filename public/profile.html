@@ -215,6 +215,15 @@
       margin-bottom: 10px;
     }
 
+    .modal-header {
+      display: flex;
+      align-items: center;   /* 버튼 세로 가운데 정렬 */
+    }
+
+    .spacer {
+      flex-grow: 1;          /* 남는 공간을 전부 차지 */
+    }
+
     #modal-content button:hover {
       background: #eee;
     }
@@ -369,6 +378,8 @@
 
     let myPosts = [];
     let scrapPosts = [];
+
+    let currentPostId = null; // post 수정버튼에서 쓰임
 
     async function loadUserProfile() {
       const res = await fetch(`/auth/${userId}/profile`);
@@ -536,6 +547,8 @@
     }
     
     function openModal(post) {
+      currentPostId = post.post_id;
+
       console.log("태그 확인:", post.tags);
       document.getElementById("modal").style.display = "block";
 
@@ -570,7 +583,48 @@
 
     function closeModal() {
       document.getElementById("modal").style.display = "none";
+      currentPostId = null;
     }
+
+    // 수정 버튼
+    function editPost() {
+      if (!currentPostId) {
+        alert("게시글 ID를 찾을 수 없습니다.");
+        return;
+      }
+      // upload.html로 이동하면서 post_id 전달 → 수정 모드
+      window.location.href = `/upload.html?post_id=${currentPostId}`;
+    }
+
+    // 삭제 버튼
+  async function deletePost() {
+    if (!currentPostId) {
+      alert("게시글 ID를 찾을 수 없습니다.");
+      return;
+    }
+
+    if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+
+    try {
+      const res = await fetch(`/post/${currentPostId}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("게시글이 삭제되었습니다.");
+        closeModal();
+        // 삭제 후 프로필 페이지 새로고침
+        window.location.reload();
+      } else {
+        alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
+      }
+    } catch (err) {
+      console.error("삭제 오류", err);
+      alert("삭제 중 문제가 발생했습니다.");
+    }
+  }
+
     // 댓글 불러오기
     async function loadComments(post_id) {
       const res = await fetch(`/comment/${post_id}`);
@@ -611,43 +665,51 @@
   </script>
     <!-- ===== 모달 ===== -->
   <div id="modal">
-      <div id="modal-content">
+    <div id="modal-content">
+      <div class="modal-header">
         <button onclick="closeModal()">닫기</button>
 
-        <img id="modal-img" src="" />
+        <!-- 자동으로 늘어나는 컨테이너 -->
+        <div class="spacer"></div>
 
-        <p class="info-label">👤 작성자</p>
-        <p id="modal-user"></p>
-
-        <p class="info-label">📅 작성일</p>
-        <p id="modal-date"></p>
-
-        <p class="info-label">✏️ 캡션</p>
-        <p id="modal-caption"></p>
-
-        <p class="info-label">📝 설명</p>
-        <p id="modal-description"></p>
-
-        <p class="info-label">🏷 태그</p>
-        <p id="modal-tags"></p>
-
-        <p class="info-label">🍽 카테고리</p>
-        <p id="modal-category"></p>
-
-        <p class="info-label">❤️ 좋아요 수</p>
-        <p id="modal-likes"></p>
-
-        <p class="info-label">⭐ 스크랩 수</p>
-        <p id="modal-scraps"></p>
-
-        <h3>댓글</h3>
-        <div id="comments"></div>
-
-        <h4>댓글 작성</h4>
-        <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
-        <button id="commentBtn">등록</button>
+        <button onclick="editPost()">수정</button>
+        <button onclick="deletePost()">삭제</button>
       </div>
+
+      <img id="modal-img" src="" />
+
+      <p class="info-label">👤 작성자</p>
+      <p id="modal-user"></p>
+
+      <p class="info-label">📅 작성일</p>
+      <p id="modal-date"></p>
+
+      <p class="info-label">✏️ 캡션</p>
+      <p id="modal-caption"></p>
+
+      <p class="info-label">📝 설명</p>
+      <p id="modal-description"></p>
+
+      <p class="info-label">🏷 태그</p>
+      <p id="modal-tags"></p>
+
+      <p class="info-label">🍽 카테고리</p>
+      <p id="modal-category"></p>
+
+      <p class="info-label">❤️ 좋아요 수</p>
+      <p id="modal-likes"></p>
+
+      <p class="info-label">⭐ 스크랩 수</p>
+      <p id="modal-scraps"></p>
+
+      <h3>댓글</h3>
+      <div id="comments"></div>
+
+      <h4>댓글 작성</h4>
+      <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
+      <button id="commentBtn">등록</button>
     </div>
+  </div>
 
   <!-- 닉네임 수정 모달 -->
   <div id="nickname-modal" class="modal">

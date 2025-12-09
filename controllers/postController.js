@@ -65,6 +65,25 @@ exports.getPosts = async (req, res) => {
   }
 };
 
+exports.getPostDetail = async (req, res) => {
+  const postId = req.params.post_id;
+  try {
+    const rows = await postModel.getPostById(postId);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+    }
+
+    const post = rows[0];
+    post.tags = post.tags ? post.tags.split(",") : [];
+
+    res.json(post);
+  } catch (err) {
+    console.error("게시글 조회 오류", err);
+    res.status(500).json({ message: "서버 오류" });
+  }
+};
+
 exports.listPosts = async (req, res) => {
   try {
     const posts = await postModel.getAll();
