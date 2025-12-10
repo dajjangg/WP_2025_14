@@ -336,12 +336,13 @@
         background: #fff4c2;
         color: #f1c40f;
       }
-      .comment-btn {
+      #modal-content button.comment-btn {
         font-size: 11px;
         padding: 3px 6px;
         margin-left: 6px;
+        margin-bottom: 0px;
         border: 1px solid #ccc;
-        background: #f9f9f9;
+        background: white;
         border-radius: 4px;
         cursor: pointer;
       }
@@ -933,8 +934,8 @@
           // 1) 댓글 작성자 == 로그인 사용자 → 수정/삭제 가능
           if (c.user_id === loggedInUserId) {
             btns = `
-              <button onclick="editComment(${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
-              <button onclick="deleteComment(${c.comment_id})">삭제</button>
+              <button class="comment-btn" onclick="editComment(${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
+              <button class="comment-btn" onclick="deleteComment(${c.comment_id})">삭제</button>
             `;
           }
           // 2) 게시물 작성자 == 로그인 사용자 → 모든 댓글 삭제 가능
