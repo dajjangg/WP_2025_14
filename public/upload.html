@@ -214,6 +214,9 @@
     }
   }
   loadPostData(); // 게시글 로드
+  if (postId) {
+  document.getElementById("imageInput").required = false;
+  }
 
   // 파일 선택 시 미리보기
   document.getElementById("imageInput").addEventListener("change", function(event) {

@@ -336,7 +336,19 @@
         background: #fff4c2;
         color: #f1c40f;
       }
-      
+      .comment-btn {
+        font-size: 11px;
+        padding: 3px 6px;
+        margin-left: 6px;
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .comment-btn:hover {
+        background: #eee;
+      }
+            
     </style>
   </head>
   <body>
@@ -835,7 +847,7 @@
         document.getElementById("modal-tags").innerHTML = tagHtml;
 
         // 댓글 불러오기
-        loadComments(post.post_id);
+        loadComments(post.post_id, post.user_id);
 
         // 댓글 등록 버튼
         document.getElementById("commentBtn").onclick = () => {
@@ -908,7 +920,7 @@
         post.scraps_count = countData.scrapCount;
       }
       // 댓글 불러오기
-      async function loadComments(post_id) {
+      async function loadComments(post_id, postOwnerId) {
         const res = await fetch(`/comment/${post_id}`);
         const comments = await res.json();
 
@@ -916,9 +928,26 @@
         commentsDiv.innerHTML = "";
 
         comments.forEach(c => {
+          let btns = "";
+
+          // 1) 댓글 작성자 == 로그인 사용자 → 수정/삭제 가능
+          if (c.user_id === loggedInUserId) {
+            btns = `
+              <button onclick="editComment(${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
+              <button onclick="deleteComment(${c.comment_id})">삭제</button>
+            `;
+          }
+          // 2) 게시물 작성자 == 로그인 사용자 → 모든 댓글 삭제 가능
+          else if (postOwnerId === loggedInUserId) {
+            btns = `
+              <button class="comment-btn" onclick="deleteComment(${c.comment_id})">삭제</button>
+            `;
+          }
+
           commentsDiv.innerHTML += `
             <div class="comment">
               <b>${c.user_name}</b>: ${c.comment}
+              ${btns}
             </div>
           `;
         });
@@ -940,6 +969,43 @@
         if (data.message) {
           input.value = "";
           loadComments(post_id); // 댓글 즉시 새로고침
+        }
+      }
+
+      async function editComment(comment_id, oldText) {
+        const newText = prompt("댓글 수정:", oldText);
+        if (!newText) return;
+
+        const res = await fetch(`/comment/${comment_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ comment: newText })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("댓글이 수정되었습니다.");
+          loadComments(currentPostId, currentPostOwnerId);
+        } else {
+          alert(data.message || "수정 실패");
+        }
+      }
+      async function deleteComment(comment_id) {
+        if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+        const res = await fetch(`/comment/${comment_id}`, {
+          method: "DELETE",
+          credentials: "include"
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("댓글이 삭제되었습니다.");
+          // 현재 보고있는 게시물 id 가져오기
+          loadComments(currentPostId, currentPostOwnerId);
+        } else {
+          alert(data.message || "삭제 실패");
         }
       }
       async function init() {
