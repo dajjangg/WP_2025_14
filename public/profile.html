@@ -196,6 +196,48 @@
       transform: scale(1.03);
       box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
+
+    .like-btn, .scrap-btn {
+        border: none;
+        background: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 4px 5px;
+        margin: 4px 0px;
+        border-radius: 14px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .like-btn:hover {
+        background: #ffe5e5;
+        color: #e74c3c; /* 빨간색 */
+        transform: scale(1.05);
+      }
+
+      .scrap-btn:hover {
+        background: #fff9d9;
+        color: #f1c40f; /* 노란색 */
+        transform: scale(1.05);
+      }
+
+      .like-btn span, .scrap-btn span {
+        font-weight: bold;
+      }
+
+      .like-btn.active {
+        background: #ffe5e5;
+        color: #e74c3c;
+      }
+
+      .scrap-btn.active {
+        background: #fff4c2;
+        color: #f1c40f;
+      }
+
     /* 오른쪽 모달 */
     #modal {
       position: fixed;
@@ -332,6 +374,21 @@
         color: white;
       }
 
+      #modal-content button.comment-btn {
+        font-size: 11px;
+        padding: 3px 6px;
+        margin-left: 6px;
+        margin-bottom: 0px;
+        border: 1px solid #ccc;
+        background: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .comment-btn:hover {
+        background: #eee;
+      }
+
       /* 애니메이션 */
       @keyframes fadeIn {
         from {opacity: 0; transform: scale(0.9);}
@@ -383,6 +440,52 @@
 
       <!-- 게시물 영역 -->
       <div class="posts-container" id="posts-area"></div>
+    </div>
+  </div>
+  <!-- ===== 모달 ===== -->
+  <div id="modal">
+    <div id="modal-content">
+      <div class="modal-header">
+        <button onclick="closeModal()">닫기</button>
+
+        <!-- 자동으로 늘어나는 컨테이너 -->
+        <div class="spacer"></div>
+
+        <button onclick="editPost()">수정</button>
+        <button onclick="deletePost()">삭제</button>
+      </div>
+
+      <img id="modal-img" src="" />
+
+      <p class="info-label">👤 작성자</p>
+      <p id="modal-user"></p>
+
+      <p class="info-label">📅 작성일</p>
+      <p id="modal-date"></p>
+
+      <p class="info-label">✏️ 캡션</p>
+      <p id="modal-caption"></p>
+
+      <p class="info-label">📝 설명</p>
+      <p id="modal-description"></p>
+
+      <p class="info-label">🏷 태그</p>
+      <p id="modal-tags"></p>
+
+      <p class="info-label">🍽 카테고리</p>
+      <p id="modal-category"></p>
+
+      <div class="modal-actions" style="margin-top: 10px; display:flex; gap:10px;">
+        <button id="modal-like-btn" class="like-btn">❤️ <span id="modal-like-count"></span></button>
+        <button id="modal-scrap-btn" class="scrap-btn">⭐ <span id="modal-scrap-count"></span></button>
+      </div>
+
+      <h3>댓글</h3>
+      <div id="comments"></div>
+
+      <h4>댓글 작성</h4>
+      <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
+      <button id="commentBtn">등록</button>
     </div>
   </div>
 
@@ -444,6 +547,20 @@
       scrapPosts = data.scraps;
 
       renderPosts(myPosts);
+    }
+
+    // 게시물 렌더링 함수
+    function renderPosts(list) {
+      postsArea.innerHTML = "";
+      list.forEach(post => {
+        const card = document.createElement("div");
+        card.className = "post-card";
+        card.innerHTML = `<img src="${post.image_path}" />`;
+
+        card.addEventListener("click", () => openModal(post));
+
+        postsArea.appendChild(card);
+      });
     }
 
     // 프로필 사진 수정
@@ -578,64 +695,41 @@
     function goHome() {
       window.location.href = "/";
     }
-
-    // 게시물 렌더링 함수
-    function renderPosts(list) {
-      postsArea.innerHTML = "";
-      list.forEach(post => {
-        const card = document.createElement("div");
-        card.className = "post-card";
-        card.innerHTML = `<img src="${post.image_path}" />`;
-
-        card.addEventListener("click", () => openModal(post));
-
-        postsArea.appendChild(card);
-      });
-    }
     
+    // 모달 열기
     function openModal(post) {
-      currentPostId = post.post_id;
-
-      console.log("태그 확인:", post.tags);
-      document.getElementById("modal").style.display = "block";
-
-      document.getElementById("modal-img").src = "/" + post.image_path;
-      document.getElementById("modal-caption").textContent = post.caption ?? "";
+      document.getElementById("modal").style.display = "flex";
+      document.getElementById("modal-img").src = `/${post.image_path}`;
+      document.getElementById("modal-caption").textContent = post.caption;
       document.getElementById("modal-description").textContent = post.description ?? "";
-      document.getElementById("modal-user").textContent = post.user_name ?? "";
-      document.getElementById("modal-date").textContent = new Date(post.created_at).toLocaleString();
-      document.getElementById("modal-likes").textContent = post.likes_count ?? 0;
-      document.getElementById("modal-scraps").textContent = post.scraps_count ?? 0;
+      document.getElementById("modal-category").textContent = post.category ?? "없음";
+      document.getElementById("modal-user").textContent = post.user_name;
+      const date = new Date(post.created_at).toLocaleString();
+      document.getElementById("modal-date").textContent = date;
+      // 좋아요 / 스크랩 버튼 상태 반영
+        const modalLikeBtn = document.getElementById("modal-like-btn");
+        const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
-      let tags = [];
+        modalLikeBtn.classList.toggle("active", post.liked);
+        modalScrapBtn.classList.toggle("active", post.scrapped);
 
-      if (typeof post.tags === "string") {
-          tags = post.tags.split(" ").filter(t => t.trim() !== "");
-      } else if (Array.isArray(post.tags)) {
-          tags = post.tags;
-      }
-      document.getElementById("modal-tags").innerHTML =
-      tags.map(t =>`<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
+        document.getElementById("modal-like-count").textContent = post.likes_count;
+        document.getElementById("modal-scrap-count").textContent = post.scraps_count;
 
-      document.getElementById("modal-category").textContent =
-      post.category ?? "카테고리 없음";
+        // 버튼 클릭 이벤트 설정
+        modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
+        modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
+      const tags = typeof post.tags === "string"
+      ? post.tags.split(" ").filter(t => t.trim() !== "")
+      : [];
 
-      const editBtn = document.querySelector("#modal-content button[onclick='editPost()']");
-      const deleteBtn = document.querySelector("#modal-content button[onclick='deletePost()']");
+      const tagHtml = tags.map(t => `<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
+      document.getElementById("modal-tags").innerHTML = tagHtml;
 
-      if (loggedInUserId === post.user_id) {
-        // 작성자 본인이라면 → 버튼 보이기
-        editBtn.style.display = "inline-block";
-        deleteBtn.style.display = "inline-block";
-      } else {
-        // 본인이 아니라면 → 버튼 숨김
-        editBtn.style.display = "none";
-        deleteBtn.style.display = "none";
-      }
       // 댓글 불러오기
-      loadComments(post.post_id);
+      loadComments(post.post_id, post.user_id);
 
-        // 댓글 등록 버튼
+      // 댓글 등록 버튼
       document.getElementById("commentBtn").onclick = () => {
         addComment(post.post_id);
       };
@@ -657,36 +751,98 @@
     }
 
     // 삭제 버튼
-  async function deletePost() {
-    if (!currentPostId) {
-      alert("게시글 ID를 찾을 수 없습니다.");
-      return;
+    async function deletePost() {
+      if (!currentPostId) {
+        alert("게시글 ID를 찾을 수 없습니다.");
+        return;
+      }
+
+      if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+
+      try {
+        const res = await fetch(`/post/${currentPostId}`, {
+          method: "DELETE"
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("게시글이 삭제되었습니다.");
+          closeModal();
+          // 삭제 후 프로필 페이지 새로고침
+          window.location.reload();
+        } else {
+          alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
+        }
+      } catch (err) {
+        console.error("삭제 오류", err);
+        alert("삭제 중 문제가 발생했습니다.");
+      }
     }
 
-    if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+    async function toggleLikeInModal(post, event) {
+      event.stopPropagation();
+      if (!loggedInUserId) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "/login.html";
+        return;
+      }
 
-    try {
-      const res = await fetch(`/post/${currentPostId}`, {
-        method: "DELETE"
+      const btn = document.getElementById("modal-like-btn");
+      const res = await fetch(`/like/${post.post_id}`, {
+        method: "POST",
+        credentials: "include"
       });
       const data = await res.json();
 
-      if (res.ok) {
-        alert("게시글이 삭제되었습니다.");
-        closeModal();
-        // 삭제 후 프로필 페이지 새로고침
-        window.location.reload();
-      } else {
-        alert("삭제 실패: " + (data.message || "알 수 없는 오류"));
-      }
-    } catch (err) {
-      console.error("삭제 오류", err);
-      alert("삭제 중 문제가 발생했습니다.");
+      // 버튼 색 변경
+      btn.classList.toggle("active", data.liked);
+
+      // 최신 카운트 가져오기
+      const countRes = await fetch(`/like/${post.post_id}/count`);
+      const countData = await countRes.json();
+      document.getElementById("modal-like-count").textContent = countData.likeCount;
+
+      // 카드에서도 즉시 반영
+      document.getElementById(`like-${post.post_id}`).textContent = countData.likeCount;
+
+      // allPosts 배열 업데이트
+      post.liked = data.liked;
+      post.likes_count = countData.likeCount;
     }
-  }
+
+    async function toggleScrapInModal(post, event) {
+      event.stopPropagation();
+      if (!loggedInUserId) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const btn = document.getElementById("modal-scrap-btn");
+      const res = await fetch(`/scrap/${post.post_id}`, {
+        method: "POST",
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      // 버튼 색 변경
+      btn.classList.toggle("active", data.scrapped);
+
+      // 최신 카운트 가져오기
+      const countRes = await fetch(`/scrap/${post.post_id}/count`);
+      const countData = await countRes.json();
+      document.getElementById("modal-scrap-count").textContent = countData.scrapCount;
+
+      // 카드에서도 즉시 반영
+      document.getElementById(`scrap-${post.post_id}`).textContent = countData.scrapCount;
+
+      // allPosts 배열 업데이트
+      post.scrapped = data.scrapped;
+      post.scraps_count = countData.scrapCount;
+    }
 
     // 댓글 불러오기
-    async function loadComments(post_id) {
+    async function loadComments(post_id, postOwnerId) {
       const res = await fetch(`/comment/${post_id}`);
       const comments = await res.json();
 
@@ -694,82 +850,89 @@
       commentsDiv.innerHTML = "";
 
       comments.forEach(c => {
+        let btns = "";
+
+        // 1) 댓글 작성자 == 로그인 사용자 → 수정/삭제 가능
+        if (c.user_id === loggedInUserId) {
+          btns = `
+            <button class="comment-btn" onclick="editComment(${post_id}, ${postOwnerId}, ${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
+            <button class="comment-btn" onclick="deleteComment(${post_id}, ${postOwnerId}, ${c.comment_id})">삭제</button>
+          `;
+        }
+        // 2) 게시물 작성자 == 로그인 사용자 → 모든 댓글 삭제 가능
+        else if (postOwnerId === loggedInUserId) {
+          btns = `
+            <button class="comment-btn" onclick="deleteComment(${c.comment_id})">삭제</button>
+          `;
+        }
+
         commentsDiv.innerHTML += `
           <div class="comment">
             <b>${c.user_name}</b>: ${c.comment}
+            ${btns}
           </div>
         `;
       });
+    }
+
+    // 댓글 작성
+    async function addComment(post_id) {
+      const input = document.getElementById("commentInput");
+      const text = input.value.trim();
+      if (text === "") return;
+
+      const res = await fetch(`/comment/${post_id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment: text })
+      });
+
+      const data = await res.json();
+      if (data.message) {
+        input.value = "";
+        loadComments(post_id); // 댓글 즉시 새로고침
       }
+    }
 
-      // 댓글 작성
-      async function addComment(post_id) {
-        const input = document.getElementById("commentInput");
-        const text = input.value.trim();
-        if (text === "") return;
+    async function editComment(post_id, postOwnerId, comment_id, oldText) {
+      const newText = prompt("댓글 수정:", oldText);
+      if (!newText) return;
 
-        const res = await fetch(`/comment/${post_id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment: text })
-        });
+      const res = await fetch(`/comment/${comment_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ comment: newText })
+      });
 
-        const data = await res.json();
-        if (data.message) {
-          input.value = "";
-          loadComments(post_id); // 댓글 즉시 새로고침
-        }
+      const data = await res.json();
+      if (res.ok) {
+        alert("댓글이 수정되었습니다.");
+        loadComments(post_id, postOwnerId);
+      } else {
+        alert(data.message || "수정 실패");
       }
+    };
+    async function deleteComment(post_id, postOwnerId, comment_id) {
+      if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+      const res = await fetch(`/comment/${comment_id}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("댓글이 삭제되었습니다.");
+        // 현재 보고있는 게시물 id 가져오기
+        loadComments(post_id, postOwnerId);
+      } else {
+        alert(data.message || "삭제 실패");
+      }
+    };
 
     loadUserProfile();
   </script>
-    <!-- ===== 모달 ===== -->
-  <div id="modal">
-    <div id="modal-content">
-      <div class="modal-header">
-        <button onclick="closeModal()">닫기</button>
-
-        <!-- 자동으로 늘어나는 컨테이너 -->
-        <div class="spacer"></div>
-
-        <button onclick="editPost()">수정</button>
-        <button onclick="deletePost()">삭제</button>
-      </div>
-
-      <img id="modal-img" src="" />
-
-      <p class="info-label">👤 작성자</p>
-      <p id="modal-user"></p>
-
-      <p class="info-label">📅 작성일</p>
-      <p id="modal-date"></p>
-
-      <p class="info-label">✏️ 캡션</p>
-      <p id="modal-caption"></p>
-
-      <p class="info-label">📝 설명</p>
-      <p id="modal-description"></p>
-
-      <p class="info-label">🏷 태그</p>
-      <p id="modal-tags"></p>
-
-      <p class="info-label">🍽 카테고리</p>
-      <p id="modal-category"></p>
-
-      <p class="info-label">❤️ 좋아요 수</p>
-      <p id="modal-likes"></p>
-
-      <p class="info-label">⭐ 스크랩 수</p>
-      <p id="modal-scraps"></p>
-
-      <h3>댓글</h3>
-      <div id="comments"></div>
-
-      <h4>댓글 작성</h4>
-      <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
-      <button id="commentBtn">등록</button>
-    </div>
-  </div>
 
   <!-- 닉네임 수정 모달 -->
   <div id="nickname-modal" class="modal">

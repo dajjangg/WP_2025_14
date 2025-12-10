@@ -273,6 +273,15 @@
         font-weight: bold;
       }
 
+      .like-btn.active {
+        background: #ffe5e5;
+        color: #e74c3c;
+      }
+
+      .scrap-btn.active {
+        background: #fff4c2;
+        color: #f1c40f;
+      }
 
       /* 모달 스타일 */
       #modal {
@@ -327,28 +336,21 @@
         background: #dbe9ff;
         transform: translateY(-2px);
       }
-      .like-btn.active {
-        background: #ffe5e5;
-        color: #e74c3c;
-      }
 
-      .scrap-btn.active {
-        background: #fff4c2;
-        color: #f1c40f;
-      }
-      .comment-btn {
+      #modal-content button.comment-btn {
         font-size: 11px;
         padding: 3px 6px;
         margin-left: 6px;
+        margin-bottom: 0px;
         border: 1px solid #ccc;
-        background: #f9f9f9;
+        background: white;
         border-radius: 4px;
         cursor: pointer;
       }
       .comment-btn:hover {
         background: #eee;
       }
-            
+
     </style>
   </head>
   <body>
@@ -919,6 +921,7 @@
         post.scrapped = data.scrapped;
         post.scraps_count = countData.scrapCount;
       }
+
       // 댓글 불러오기
       async function loadComments(post_id, postOwnerId) {
         const res = await fetch(`/comment/${post_id}`);
@@ -933,8 +936,8 @@
           // 1) 댓글 작성자 == 로그인 사용자 → 수정/삭제 가능
           if (c.user_id === loggedInUserId) {
             btns = `
-              <button onclick="editComment(${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
-              <button onclick="deleteComment(${c.comment_id})">삭제</button>
+              <button class="comment-btn" onclick="editComment(${post_id}, ${postOwnerId}, ${c.comment_id}, '${c.comment.replace(/'/g, "\\'")}')">수정</button>
+              <button class="comment-btn" onclick="deleteComment(${post_id}, ${postOwnerId}, ${c.comment_id})">삭제</button>
             `;
           }
           // 2) 게시물 작성자 == 로그인 사용자 → 모든 댓글 삭제 가능
@@ -972,7 +975,7 @@
         }
       }
 
-      async function editComment(comment_id, oldText) {
+      async function editComment(post_id, postOwnerId, comment_id, oldText) {
         const newText = prompt("댓글 수정:", oldText);
         if (!newText) return;
 
@@ -986,12 +989,12 @@
         const data = await res.json();
         if (res.ok) {
           alert("댓글이 수정되었습니다.");
-          loadComments(currentPostId, currentPostOwnerId);
+          loadComments(post_id, postOwnerId);
         } else {
           alert(data.message || "수정 실패");
         }
       }
-      async function deleteComment(comment_id) {
+      async function deleteComment(post_id, postOwnerId, comment_id) {
         if (!confirm("댓글을 삭제하시겠습니까?")) return;
 
         const res = await fetch(`/comment/${comment_id}`, {
@@ -1003,7 +1006,7 @@
         if (res.ok) {
           alert("댓글이 삭제되었습니다.");
           // 현재 보고있는 게시물 id 가져오기
-          loadComments(currentPostId, currentPostOwnerId);
+          loadComments(post_id, postOwnerId);
         } else {
           alert(data.message || "삭제 실패");
         }
