@@ -273,6 +273,15 @@
         font-weight: bold;
       }
 
+      .like-btn.active {
+        background: #ffe5e5;
+        color: #e74c3c;
+      }
+
+      .scrap-btn.active {
+        background: #fff4c2;
+        color: #f1c40f;
+      }
 
       /* 모달 스타일 */
       #modal {
@@ -327,15 +336,7 @@
         background: #dbe9ff;
         transform: translateY(-2px);
       }
-      .like-btn.active {
-        background: #ffe5e5;
-        color: #e74c3c;
-      }
 
-      .scrap-btn.active {
-        background: #fff4c2;
-        color: #f1c40f;
-      }
       #modal-content button.comment-btn {
         font-size: 11px;
         padding: 3px 6px;
@@ -920,6 +921,7 @@
         post.scrapped = data.scrapped;
         post.scraps_count = countData.scrapCount;
       }
+
       // 댓글 불러오기
       async function loadComments(post_id, postOwnerId) {
         const res = await fetch(`/comment/${post_id}`);
