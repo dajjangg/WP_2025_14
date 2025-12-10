@@ -121,25 +121,25 @@ module.exports = {
     let params = [];
     let updateFields = [];
 
-    // ¿Ã∏ß ºˆ¡§
+    // ÔøΩÃ∏ÔøΩ ÔøΩÔøΩÔøΩÔøΩ
     if (user_name !== null) {
       updateFields.push(`user_name = ?`);
       params.push(user_name);
     }
 
-    // º“∞≥ ºˆ¡§
+    // ÔøΩ“∞ÔøΩ ÔøΩÔøΩÔøΩÔøΩ
     if (intro !== null) {
       updateFields.push(`intro = ?`);
       params.push(intro);
     }
 
-    // «¡∑Œ«  ¿ÃπÃ¡ˆ ºˆ¡§
+    // ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÃπÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ
     if (profile_image !== null) {
       updateFields.push(`profile_image = ?`);
       params.push(profile_image);
     }
 
-    // æ˜µ•¿Ã∆Æ«“ «◊∏Ò¿Ã æ¯¥Ÿ∏È ¡æ∑·
+    // ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ∆ÆÔøΩÔøΩ ÔøΩ◊∏ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩŸ∏ÔøΩ ÔøΩÔøΩÔøΩÔøΩ
     if (updateFields.length === 0) return false;
 
     sql += updateFields.join(", ") + ` WHERE user_id = ?`;
@@ -149,17 +149,43 @@ module.exports = {
     return result.affectedRows > 0;
   },
 
+  async updateProfileImage(userId, imagePath) {
+    const [result] = await db.query(
+      "UPDATE users SET profile_image = ? WHERE user_id = ?",
+      [imagePath, userId]
+    );
+    return result;
+  },
+
   async isUsernameTaken(user_name, exclude_user_id = null) {
-  let sql = `SELECT user_id FROM users WHERE user_name = ?`;
-  let params = [user_name];
+    let sql = `SELECT user_id FROM users WHERE user_name = ?`;
+    let params = [user_name];
 
-  // ∫ª¿Œ ∞Ë¡§ ¡¶ø‹ (∫ª¿Œ ¿Ã∏ß ±◊¥Î∑Œ ¿˙¿Â«“ ∂ß ø¿∑˘ πÊ¡ˆ)
-  if (exclude_user_id !== null) {
-    sql += ` AND user_id != ?`;
-    params.push(exclude_user_id);
+    // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ (ÔøΩÔøΩÔøΩÔøΩ ÔøΩÃ∏ÔøΩ ÔøΩ◊¥ÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ)
+    if (exclude_user_id !== null) {
+      sql += ` AND user_id != ?`;
+      params.push(exclude_user_id);
+    }
+
+    const [rows] = await db.query(sql, params);
+    return rows.length > 0; // ÔøΩﬂ∫ÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩ true
+  },
+
+  // ÎãâÎÑ§ÏûÑ ÏàòÏ†ï
+  async updateUserName(user_id, user_name) {
+    const [result] = await db.query(
+      "UPDATE users SET user_name = ? WHERE user_id = ?",
+      [user_name, user_id]
+    );
+    return result.affectedRows > 0;
+  },
+
+  // ÏÜåÍ∞ú ÏàòÏ†ï
+  async updateIntro(user_id, intro) {
+    const [result] = await db.query(
+      "UPDATE users SET intro = ? WHERE user_id = ?",
+      [intro, user_id]
+    );
+    return result.affectedRows > 0;
   }
-
-  const [rows] = await db.query(sql, params);
-  return rows.length > 0; // ¡ﬂ∫π ¿÷¿Ω °Ê true
-}
 };

@@ -12,12 +12,14 @@ exports.toggleLike = async (req, res) => {
       // 이미 좋아요 → 취소
       await likesModel.removeLike(post_id, user_id);
       await likesModel.decreaseLikeCount(post_id);
-      return res.json({ message: "좋아요 취소 성공" });
+      const count = await likesModel.countLikes(post_id);
+      return res.json({ liked: false, likeCount: count, message: "좋아요 취소 성공" });
     } else {
       // 아직 안 눌렀음 → 추가
       await likesModel.addLike(post_id, user_id);
       await likesModel.increaseLikeCount(post_id);
-      return res.json({ message: "좋아요 성공" });
+      const count = await likesModel.countLikes(post_id);
+      return res.json({ liked: true, likeCount: count, message: "좋아요 성공" });
     }
   } catch (err) {
     console.error(err);

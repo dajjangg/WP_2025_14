@@ -9,6 +9,8 @@ const { isLoggedIn } = require("../middleware/authMiddleware");
 router.post("/upload", isLoggedIn, upload.single("image"), postController.uploadPost);
 // 전체 게시물 조회
 router.get("/", postController.getPosts);
+// 특정 게시물 상세 조회
+router.get("/:post_id", postController.getPostDetail);
 // 게시물 리스트 페이지용 (HTML 렌더링)
 router.get("/list", postController.listPosts);
 // 게시물 수정 (사진 포함)

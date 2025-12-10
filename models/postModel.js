@@ -45,6 +45,21 @@ module.exports = {
     return posts;
   },
 
+  // 게시글 상세 조회
+  async getPostById(postId) {
+    const [rows] = await db.query(
+      `SELECT p.*, u.user_name, GROUP_CONCAT(t.tag_name) AS tags
+       FROM posts p
+       JOIN users u ON p.user_id = u.user_id
+       LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+       LEFT JOIN tags t ON pt.tag_id = t.tag_id
+       WHERE p.post_id = ?
+       GROUP BY p.post_id`,
+      [postId]
+    );
+    return rows;
+  },
+
   async getAll() {
     const [rows] = await db.query(
       "SELECT * FROM posts ORDER BY created_at DESC"

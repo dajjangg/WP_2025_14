@@ -10,6 +10,12 @@ router.post("/logout", authController.logout);
 router.get("/me", isLoggedIn, authController.getMyProfile);
 // 다른 사람 프로필
 router.get("/:user_id/profile", authController.getUserProfile);
+// 닉네임 수정
+router.post("/:user_id/profile/username", authController.updateUserName);
+// 한 줄 소개 수정
+router.post("/:user_id/profile/intro", authController.updateIntro);
+// 프로필 이미지 업로드
+router.post("/:user_id/profile/image", authController.updateProfileImage);
 //로그인 했는지 아닌지 체크
 router.get("/status", (req, res) => {
   if (req.isAuthenticated()) {

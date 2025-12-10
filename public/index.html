@@ -611,11 +611,11 @@
         if (listScrapCount) listScrapCount.innerText = countData.scrapCount;
         
         const target = allPosts.find(p => p.post_id === post_id);
-          if (target) {
-            target.scrapped = data.scrapped;
-            target.scraps_count = countData.scrapCount;
-          }
+        if (target) {
+          target.scrapped = data.scrapped;
+          target.scraps_count = countData.scrapCount;
         }
+      }
 
       function resetFilters() {
         selectedCategory = "전체";
