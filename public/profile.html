@@ -387,6 +387,24 @@
   </div>
 
   <script>
+
+    async function checkLoginStatus() {
+      try {
+        const res = await fetch("/auth/status", {
+          credentials: "include" // 세션 쿠키 포함
+        });
+
+        const data = await res.json();
+
+        if (data.loggedIn) {
+          loggedInUserId = data.user_id;
+        }
+      } catch (err) {
+        console.error("로그인 상태 확인 실패", err);
+      }
+    }
+    checkLoginStatus();
+
     function searchByTag(tag, event) {
         event.stopPropagation();  // 모달 클릭 막기
         // 검색 페이지로 이동하면서 태그 전달
@@ -601,6 +619,19 @@
 
       document.getElementById("modal-category").textContent =
       post.category ?? "카테고리 없음";
+
+      const editBtn = document.querySelector("#modal-content button[onclick='editPost()']");
+      const deleteBtn = document.querySelector("#modal-content button[onclick='deletePost()']");
+
+      if (loggedInUserId === post.user_id) {
+        // 작성자 본인이라면 → 버튼 보이기
+        editBtn.style.display = "inline-block";
+        deleteBtn.style.display = "inline-block";
+      } else {
+        // 본인이 아니라면 → 버튼 숨김
+        editBtn.style.display = "none";
+        deleteBtn.style.display = "none";
+      }
       // 댓글 불러오기
       loadComments(post.post_id);
 
