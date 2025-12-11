@@ -690,7 +690,7 @@
 
       // 댓글 등록 버튼
       document.getElementById("commentBtn").onclick = () => {
-        addComment(post.post_id);
+        addComment(post.post_id, post.user_id);
       };
     }
 
@@ -802,7 +802,7 @@
       searchTags();     // 검색 실행
     }
 
-    async function addComment(post_id) {
+    async function addComment(post_id, postOwnerId) {
       const input = document.getElementById("commentInput");
       const text = input.value.trim();
       if (text === "") return;
@@ -816,7 +816,7 @@
       const data = await res.json();
       if (data.message) {
         input.value = "";
-        loadComments(post_id);
+        loadComments(post_id, postOwnerId);
       }
     }
     window.onload = function () {
