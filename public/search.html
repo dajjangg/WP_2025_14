@@ -546,7 +546,7 @@
         modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
         modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
       const tags = typeof post.tags === "string"
-      ? post.tags.split(" ").filter(t => t.trim() !== "")
+      ? post.tags.split(",").filter(t => t.trim() !== "")
       : [];
 
       const tagHtml = tags.map(t => `<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
