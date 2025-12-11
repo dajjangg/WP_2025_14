@@ -815,6 +815,9 @@
       const modalLikeBtn = document.getElementById("modal-like-btn");
       const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
+      modalLikeBtn.classList.remove("active");
+      modalScrapBtn.classList.remove("active");
+
       modalLikeBtn.classList.toggle("active", post.liked);
       modalScrapBtn.classList.toggle("active", post.scrapped);
 
