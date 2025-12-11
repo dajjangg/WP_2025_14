@@ -245,9 +245,8 @@
       right: 90px;
       width: 25%;          /* 오른쪽 영역만 사용 (더 좁게) */
       height: 70%;
-      background: rgba(255, 255, 255, 0.95);
+      background: white;
       display: none;
-      padding: auto;
       box-shadow: -4px 0 15px rgba(0,0,0,0.1);
       overflow-y: auto;
       z-index: 2000;
@@ -388,12 +387,113 @@
       .comment-btn:hover {
         background: #eee;
       }
+      #commentInput {
+        margin-bottom: 10px;
+      }
 
       /* 애니메이션 */
       @keyframes fadeIn {
         from {opacity: 0; transform: scale(0.9);}
         to {opacity: 1; transform: scale(1);}
       }
+
+      
+      /* 모달 이미지 */
+      #modal-img {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      /* 항목 라벨 */
+      .info-label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 5px;
+        color: #444;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* 내용 텍스트 */
+      #modal-content p {
+        margin: 3px 0 10px 0;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #333;
+      }
+
+      /* 태그 스타일 */
+      .tag-item {
+        background: #eef4ff;
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 12px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .tag-item:hover {
+        background: #dbe9ff;
+      }
+
+      /* 댓글 영역 */
+      #comments {
+        margin-top: 15px;
+        padding: 10px 14px;
+        background: #fafafa;
+        border-radius: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+      }
+
+      .comment {
+        padding: 8px 0;
+        border-bottom: 1px solid #ececec;
+      }
+
+      .comment:last-child {
+        border-bottom: none;
+      }
+
+      /* 댓글 작성 */
+      #commentInput {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+
+      #commentBtn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        background: #f7f7f7;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      #commentBtn:hover {
+        background: #eee;
+      }
+
+      /* 닫기 버튼 */
+      #modal-content > button:first-child {
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        float: right;
+      } 
   </style>
 </head>
 <body>
@@ -700,7 +800,7 @@
     function openModal(post) {
       currentPostId = post.post_id;
 
-      document.getElementById("modal").style.display = "flex";
+      document.getElementById("modal").style.display = "block";
       document.getElementById("modal-img").src = `/${post.image_path}`;
       document.getElementById("modal-caption").textContent = post.caption;
       document.getElementById("modal-description").textContent = post.description ?? "";
@@ -844,7 +944,7 @@
     }
 
     // 댓글 불러오기
-    async function loadComments(post_id, postOwnerId) {
+    async function loadComments(post_id, postOwnerId = loggedInUserId) {
       const res = await fetch(`/comment/${post_id}`);
       const comments = await res.json();
 
