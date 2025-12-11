@@ -698,6 +698,8 @@
     
     // 모달 열기
     function openModal(post) {
+      currentPostId = post.post_id;
+
       document.getElementById("modal").style.display = "flex";
       document.getElementById("modal-img").src = `/${post.image_path}`;
       document.getElementById("modal-caption").textContent = post.caption;
