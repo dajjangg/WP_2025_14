@@ -206,12 +206,13 @@
         width: 100%; height: 100%;
         background: rgba(0,0,0,0.5);
         display: none; justify-content: center; align-items: center;
-        overflow-y: auto;
+        overflow-y: hidden;
         padding: 40px 0;
       }
 
       #modal-content {
-        width: 450px; max-height: 90vh; overflow-y: auto; background: white; padding: 20px; border-radius: 10px; margin-top: 50px;
+        width: 450px; max-height: 90vh; overflow-y: auto; background: white; 
+        padding: 20px; border-radius: 10px; margin-top: 50px;
       }
       #modal-content button {
         padding: 6px 10px;
@@ -267,6 +268,137 @@
       .comment-btn:hover {
         background: #eee;
       }
+      #commentInput {
+        margin-bottom: 10px;
+      }
+
+      
+      /* 모달 전체 */
+      #modal {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0,0,0,0.45);
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; 
+        height: 100%;
+        padding: 30px 10px;
+        z-index: 999;
+      }
+
+      /* 모달 박스 */
+      #modal-content {
+        width: 480px;
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        animation: modalFade 0.25s ease-out;
+      }
+
+      /* 등장 애니메이션 */
+      @keyframes modalFade {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0px); }
+      }
+
+      /* 모달 이미지 */
+      #modal-img {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      /* 항목 라벨 */
+      .info-label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 5px;
+        color: #444;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* 내용 텍스트 */
+      #modal-content p {
+        margin: 3px 0 10px 0;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #333;
+      }
+
+      /* 태그 스타일 */
+      .tag-item {
+        background: #eef4ff;
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 12px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .tag-item:hover {
+        background: #dbe9ff;
+      }
+
+      /* 댓글 영역 */
+      #comments {
+        margin-top: 15px;
+        padding: 10px 14px;
+        background: #fafafa;
+        border-radius: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+      }
+
+      .comment {
+        padding: 8px 0;
+        border-bottom: 1px solid #ececec;
+      }
+
+      .comment:last-child {
+        border-bottom: none;
+      }
+
+      /* 댓글 작성 */
+      #commentInput {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+
+      #commentBtn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        background: #f7f7f7;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      #commentBtn:hover {
+        background: #eee;
+      }
+
+      /* 닫기 버튼 */
+      #modal-content > button:first-child {
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        float: right;
+      } 
   </style>
 </head>
 
@@ -524,6 +656,7 @@
 
     // 모달 열기
     function openModal(post) {
+      currentPostId = post.post_id;
       document.getElementById("modal").style.display = "flex";
       document.getElementById("modal-img").src = `/${post.image_path}`;
       document.getElementById("modal-caption").textContent = post.caption;
@@ -628,7 +761,7 @@
     }
 
     // 댓글 불러오기
-    async function loadComments(post_id, postOwnerId) {
+    async function loadComments(post_id, postOwnerId = loggedInUserId) {
       const res = await fetch(`/comment/${post_id}`);
       const comments = await res.json();
 
