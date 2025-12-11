@@ -980,7 +980,7 @@
         // 2) 게시물 작성자 == 로그인 사용자 → 모든 댓글 삭제 가능
         else if (postOwnerId === loggedInUserId) {
           btns = `
-            <button class="comment-btn" onclick="deleteComment(${c.comment_id})">삭제</button>
+            <button class="comment-btn" onclick="deleteComment(${post_id}, ${postOwnerId}, ${c.comment_id})">삭제</button>
           `;
         }
 
