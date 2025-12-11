@@ -551,8 +551,8 @@
         <!-- 자동으로 늘어나는 컨테이너 -->
         <div class="spacer"></div>
 
-        <button onclick="editPost()">수정</button>
-        <button onclick="deletePost()">삭제</button>
+        <button id="edit-btn" onclick="editPost()">수정</button>
+        <button id="delete-btn" onclick="deletePost()">삭제</button>
       </div>
 
       <img id="modal-img" src="" />
@@ -590,6 +590,7 @@
   </div>
 
   <script>
+    let currentTab = "myPosts"; //탭 구분용, 기본값: 내 게시물
 
     async function checkLoginStatus() {
       try {
@@ -609,10 +610,14 @@
     checkLoginStatus();
 
     function searchByTag(tag, event) {
-        event.stopPropagation();  // 모달 클릭 막기
-        // 검색 페이지로 이동하면서 태그 전달
-        window.location.href = `/search.html?tag=${encodeURIComponent(tag)}`;
-      }
+      event.stopPropagation();  // 모달 클릭 막기
+      // 검색 페이지로 이동하면서 태그 전달
+      window.location.href = `/search.html?tag=${encodeURIComponent(tag)}`;
+    }
+
+    function goHome() {
+      window.location.href = "/";
+    }
     function goUpload() { window.location.href = "/upload.html"; }
 
     //사진 수정용
@@ -781,20 +786,18 @@
 
     // 탭 클릭 이벤트
     tabMyPosts.addEventListener("click", () => {
+      currentTab = "myPosts";
       tabMyPosts.classList.add("active");
       tabScraps.classList.remove("active");
       renderPosts(myPosts);
     });
 
     tabScraps.addEventListener("click", () => {
+      currentTab = "scraps";
       tabScraps.classList.add("active");
       tabMyPosts.classList.remove("active");
       renderPosts(scrapPosts);
     });
-
-    function goHome() {
-      window.location.href = "/";
-    }
     
     // 모달 열기
     function openModal(post) {
@@ -809,22 +812,23 @@
       const date = new Date(post.created_at).toLocaleString();
       document.getElementById("modal-date").textContent = date;
       // 좋아요 / 스크랩 버튼 상태 반영
-        const modalLikeBtn = document.getElementById("modal-like-btn");
-        const modalScrapBtn = document.getElementById("modal-scrap-btn");
+      const modalLikeBtn = document.getElementById("modal-like-btn");
+      const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
-        modalLikeBtn.classList.toggle("active", post.liked);
-        modalScrapBtn.classList.toggle("active", post.scrapped);
+      modalLikeBtn.classList.toggle("active", post.liked);
+      modalScrapBtn.classList.toggle("active", post.scrapped);
 
-        document.getElementById("modal-like-count").textContent = post.likes_count;
-        document.getElementById("modal-scrap-count").textContent = post.scraps_count;
+      document.getElementById("modal-like-count").textContent = post.likes_count;
+      document.getElementById("modal-scrap-count").textContent = post.scraps_count;
 
-        // 버튼 클릭 이벤트 설정
-        modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
-        modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
+      // 버튼 클릭 이벤트 설정
+      modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
+      modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
+
+      //태그 표시
       const tags = typeof post.tags === "string"
       ? post.tags.split(" ").filter(t => t.trim() !== "")
       : [];
-
       const tagHtml = tags.map(t => `<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
       document.getElementById("modal-tags").innerHTML = tagHtml;
 
@@ -835,6 +839,18 @@
       document.getElementById("commentBtn").onclick = () => {
         addComment(post.post_id, post.user_id);
       };
+
+      // 스크랩 탭일 때는 수정/삭제 버튼 숨기기
+      const editBtn = document.getElementById("edit-btn");
+      const deleteBtn = document.getElementById("delete-btn");
+
+      if (currentTab === "scraps") {
+        editBtn.style.display = "none";
+        deleteBtn.style.display = "none";
+      } else {
+        editBtn.style.display = "inline-block";
+        deleteBtn.style.display = "inline-block";
+      }
     }
 
     function closeModal() {
