@@ -757,20 +757,18 @@
 
     // 탭 클릭 이벤트
     tabMyPosts.addEventListener("click", () => {
+      currentTab = "myPosts";
       tabMyPosts.classList.add("active");
       tabScraps.classList.remove("active");
       renderPosts(myPosts);
     });
 
     tabScraps.addEventListener("click", () => {
+      currentTab = "scraps";
       tabScraps.classList.add("active");
       tabMyPosts.classList.remove("active");
       renderPosts(scrapPosts);
     });
-
-    function goHome() {
-      window.location.href = "/";
-    }
     
     // 모달 열기
     function openModal(post) {
@@ -798,19 +796,17 @@
         const modalLikeBtn = document.getElementById("modal-like-btn");
         const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
-        modalLikeBtn.classList.toggle("active", post.liked);
-        modalScrapBtn.classList.toggle("active", post.scrapped);
+      document.getElementById("modal-like-count").textContent = post.likes_count;
+      document.getElementById("modal-scrap-count").textContent = post.scraps_count;
 
-        document.getElementById("modal-like-count").textContent = post.likes_count;
-        document.getElementById("modal-scrap-count").textContent = post.scraps_count;
+      // 버튼 클릭 이벤트 설정
+      modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
+      modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
 
-        // 버튼 클릭 이벤트 설정
-        modalLikeBtn.onclick = (e) => toggleLikeInModal(post, e);
-        modalScrapBtn.onclick = (e) => toggleScrapInModal(post, e);
+      //태그 표시
       const tags = typeof post.tags === "string"
       ? post.tags.split(" ").filter(t => t.trim() !== "")
       : [];
-
       const tagHtml = tags.map(t => `<span class="tag-item" onclick="searchByTag('${t}', event)">#${t}</span>`).join(" ");
       document.getElementById("modal-tags").innerHTML = tagHtml;
 
@@ -821,6 +817,18 @@
       document.getElementById("commentBtn").onclick = () => {
         addComment(post.post_id, post.user_id);
       };
+
+      // 스크랩 탭일 때는 수정/삭제 버튼 숨기기
+      const editBtn = document.getElementById("edit-btn");
+      const deleteBtn = document.getElementById("delete-btn");
+
+      if (currentTab === "scraps") {
+        editBtn.style.display = "none";
+        deleteBtn.style.display = "none";
+      } else {
+        editBtn.style.display = "inline-block";
+        deleteBtn.style.display = "inline-block";
+      }
     }
     // 모달 닫기
     function closeModal() {
