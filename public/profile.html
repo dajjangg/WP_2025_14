@@ -818,10 +818,6 @@
         addComment(post.post_id, post.user_id);
       };
 
-      // 스크랩 탭일 때는 수정/삭제 버튼 숨기기
-      const editBtn = document.getElementById("edit-btn");
-      const deleteBtn = document.getElementById("delete-btn");
-
       if (currentTab === "scraps") {
         editBtn.style.display = "none";
         deleteBtn.style.display = "none";
