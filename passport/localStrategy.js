@@ -1,3 +1,5 @@
+// Passport 로그인 전략
+
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");

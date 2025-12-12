@@ -1,6 +1,7 @@
+// 게시물 업로드/수정/삭제/조회 등의 API 경로 정의 라우터
+
 const express = require("express");
 const router = express.Router();
-
 const upload = require("../config/multer");
 const postController = require("../controllers/postController");
 const { isLoggedIn } = require("../middleware/authMiddleware");

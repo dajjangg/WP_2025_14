@@ -1,3 +1,6 @@
+// 댓글 관련 DB 처리
+// 댓글 생성, 조회, 수정, 삭제 및 게시물 작성자와 연동되는 정보 조회 기능을 포함
+
 const db = require("../config/db");
 
 module.exports = {
@@ -33,24 +36,23 @@ module.exports = {
   },
 
   // 댓글 and 게시물의 작성자 정보 조회
-    async findCommentWithPost(comment_id) {
-      const [rows] = await db.query(
-        `SELECT c.comment_id, c.user_id, p.user_id AS post_owner_id
-         FROM comments c
-         JOIN posts p ON c.post_id = p.post_id
-         WHERE c.comment_id = ?`,
-        [comment_id]
+  async findCommentWithPost(comment_id) {
+    const [rows] = await db.query(
+      `SELECT c.comment_id, c.user_id, p.user_id AS post_owner_id
+       FROM comments c
+       JOIN posts p ON c.post_id = p.post_id
+       WHERE c.comment_id = ?`,
+       [comment_id]
       );
       return rows[0]; // 없으면 undefined
     },
 
   // 댓글 삭제 (user_id 체크는 컨트롤러에서 처리)
   async deleteComment(comment_id, user_id) {
-    // 본인 댓글만 삭제 가능하도록 user_id 체크
     const [result] = await db.query(
       "DELETE FROM comments WHERE comment_id = ?",
       [comment_id]
     );
-    return result.affectedRows; // 1이면 삭제 성공, 0이면 실패
+    return result.affectedRows;
   }
 };

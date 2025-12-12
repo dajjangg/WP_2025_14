@@ -1,6 +1,10 @@
+// 사용자 정보 관련 DB 처리
+// 회원가입, 로그인용 데이터 조회, 프로필 정보 수정 등 포함
+
 const db = require("../config/db");
 
 module.exports = {
+  // user_name(사용자 닉네임)으로 사용자 정보 조회
   async findByUsername(user_name) {
     const [rows] = await db.query(
       "SELECT * FROM users WHERE user_name = ?",
@@ -9,6 +13,7 @@ module.exports = {
     return rows[0];
   },
 
+  // user_id로 사용자 정보 조회
   async findById(user_id) {
     const [rows] = await db.query(
       "SELECT * FROM users WHERE user_id = ?",
@@ -17,6 +22,7 @@ module.exports = {
     return rows[0];
   },
 
+  // 새 사용자 생성 (회원가입)
   async createUser(user_name, pw_hash) {
     const [result] = await db.query(
       "INSERT INTO users (user_name, pw_hash) VALUES (?, ?)",
@@ -25,6 +31,7 @@ module.exports = {
     return result.insertId;
   },
 
+  // user_id로 프로필용 사용자 정보 조회
   async getUserById(user_id) {
     const [rows] = await db.query(
       `SELECT user_id, user_name, profile_image, intro, created_at 
@@ -34,6 +41,7 @@ module.exports = {
     return rows[0];
   },
 
+  // 프로필 페이지에서 필요한 전체 정보 조회
   async getProfileInfo(user_id) {
     const [userRows] = await db.query(
       `SELECT user_id, user_name, profile_image, intro, created_at
@@ -62,6 +70,7 @@ module.exports = {
     };
   },
 
+  // 사용자가 업로드한 게시물 전체 조회
   async getUserPosts(user_id) {
     const [rows] = await db.query(
       `SELECT 
@@ -88,6 +97,7 @@ module.exports = {
     return rows;
   },
 
+  // 사용자가 스크랩한 게시물 전체 조회
   async getScrappedPosts(user_id) {
     const [rows] = await db.query(
       `SELECT
@@ -116,30 +126,24 @@ module.exports = {
     return rows;
   },
 
+  // 사용자 이름/소개/프로필 이미지 등을 선택적으로 업데이트
   async updateUserProfile(user_id, user_name = null, intro = null, profile_image = null) {
     let sql = `UPDATE users SET `;
     let params = [];
     let updateFields = [];
 
-    // �̸� ����
     if (user_name !== null) {
       updateFields.push(`user_name = ?`);
       params.push(user_name);
     }
-
-    // �Ұ� ����
     if (intro !== null) {
       updateFields.push(`intro = ?`);
       params.push(intro);
     }
-
-    // ������ �̹��� ����
     if (profile_image !== null) {
       updateFields.push(`profile_image = ?`);
       params.push(profile_image);
     }
-
-    // ������Ʈ�� �׸��� ���ٸ� ����
     if (updateFields.length === 0) return false;
 
     sql += updateFields.join(", ") + ` WHERE user_id = ?`;
@@ -149,6 +153,7 @@ module.exports = {
     return result.affectedRows > 0;
   },
 
+  // 프로필 이미지 경로만 업데이트
   async updateProfileImage(userId, imagePath) {
     const [result] = await db.query(
       "UPDATE users SET profile_image = ? WHERE user_id = ?",
@@ -157,18 +162,18 @@ module.exports = {
     return result;
   },
 
+  // 닉네임 중복 여부 확인 (닉네임 수정 시 필요)
   async isUsernameTaken(user_name, exclude_user_id = null) {
     let sql = `SELECT user_id FROM users WHERE user_name = ?`;
     let params = [user_name];
 
-    // ���� ���� ���� (���� �̸� �״�� ������ �� ���� ����)
     if (exclude_user_id !== null) {
       sql += ` AND user_id != ?`;
       params.push(exclude_user_id);
     }
 
     const [rows] = await db.query(sql, params);
-    return rows.length > 0; // �ߺ� ���� �� true
+    return rows.length > 0;
   },
 
   // 닉네임 수정

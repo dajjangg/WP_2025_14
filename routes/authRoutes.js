@@ -1,10 +1,16 @@
+// 사용자 관련 API 경로 정의 라우터
+// 회원가입, 로그인, 로그아웃, 프로필 조회/수정
+
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 const { isLoggedIn } = require("../middleware/authMiddleware");
 
+// 회원가입
 router.post("/register", authController.register);
+// 로그인
 router.post("/login", authController.login);
+// 로그아웃
 router.post("/logout", authController.logout);
 // 내 프로필
 router.get("/me", isLoggedIn, authController.getMyProfile);
@@ -25,7 +31,6 @@ router.get("/status", (req, res) => {
       user_name: req.user.user_name
     });
   }
-
   return res.json({ loggedIn: false });
 });
 

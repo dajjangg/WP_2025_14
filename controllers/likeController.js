@@ -1,5 +1,8 @@
+// 좋아요 토글 처리 및 좋아요 개수 반환 등 좋아요 관련 요청 처리 컨트롤러
+
 const likesModel = require("../models/likeModel");
 
+// 좋아요 추가/취소
 exports.toggleLike = async (req, res) => {
   try {
     const post_id = req.params.post_id;
@@ -26,7 +29,7 @@ exports.toggleLike = async (req, res) => {
     res.status(500).json({ error: "좋아요 토글 실패" });
   }
 };
-
+// 좋아요 수 조회
 exports.getLikeCount = async (req, res) => {
   try {
     const post_id = req.params.post_id;

@@ -1,3 +1,4 @@
+<!-- 게시물 업로드 및 수정 페이지 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -19,7 +20,6 @@
       background: #f7f7f7;
     }
 
-    /* 상단 네비게이션 */
     .navbar {
       width: 100%;
       background: white;
@@ -43,7 +43,7 @@
     .nav-right {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;          /* 버튼 줄바꿈 */
+      flex-wrap: wrap;  
       max-width: 100%;
       justify-content: flex-end;
       box-sizing: border-box;
@@ -110,9 +110,8 @@
 </head>
 <body>
 
-<!-- 네비게이션 -->
 <div class="navbar">
-  <div class="nav-left">🍜 음식 갤러리</div>
+  <div class="nav-left">🍜 Food Gallery</div>
 
   <div class="nav-right">
     <button onclick="goHome()">홈으로</button>
@@ -152,14 +151,13 @@
 
 <script>
   let loggedInUserId = null;
-  // URL에서 post_id 가져오기
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get("post_id"); // 수정모드 여부 확인
-
+  // 로그인 확인
   async function checkLoginStatus() {
     try {
       const res = await fetch("/auth/status", {
-        credentials: "include" // 세션 쿠키 포함
+        credentials: "include"
       });
 
       const data = await res.json();
@@ -172,8 +170,9 @@
     }
   }
   checkLoginStatus();
-
+  // 홈으로
   function goHome() { window.location.href = "/index.html"; }
+  // 내 프로필로
   function goProfile() {
     if (!loggedInUserId) {
       alert("로그인이 필요한 서비스입니다.");
@@ -255,7 +254,7 @@
       const data = await res.json();
       if (res.ok) {
         alert(postId ? "게시물이 수정되었습니다!" : "게시물이 업로드되었습니다!");
-        window.location.href = "/index.html";
+        window.location.href = `/profile.html?user_id=${loggedInUserId}`;
       } else {
         alert("업로드 실패: " + (data.message || "알 수 없는 오류"));
       }

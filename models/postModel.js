@@ -1,3 +1,6 @@
+// 게시물 데이터를 DB에서 조회, 등록, 수정, 삭제 가능
+// 유저별 게시물 목록 조회 등도 포함
+
 const db = require("../config/db");
 const likeModel = require("./likeModel");
 const scrapModel = require("./scrapModel");
@@ -11,6 +14,8 @@ module.exports = {
     return result.insertId;
   },
 
+  // 게시물 전체 조회
+  // 로그인 되어있다면 좋아요, 스크랩 여부 설정 포함
   async getAllPosts(user_id) {
     const [posts] = await db.query(`
       SELECT 
@@ -40,7 +45,6 @@ module.exports = {
         post.liked = false;
         post.scrapped = false;
       }
-
     }
     return posts;
   },
@@ -60,6 +64,7 @@ module.exports = {
     return rows;
   },
 
+  // 게시글들만 시간 순서로 가져오기
   async getAll() {
     const [rows] = await db.query(
       "SELECT * FROM posts ORDER BY created_at DESC"
@@ -67,6 +72,7 @@ module.exports = {
     return rows;
   },
 
+  // 특정 post_id로 게시물 조회
   async findById(post_id) {
     const [rows] = await db.query(
       "SELECT * FROM posts WHERE post_id = ?",
@@ -75,6 +81,7 @@ module.exports = {
     return rows[0];
   },
 
+  // 게시물 수정(업데이트)
   async updatePost(post_id, fields) {
     const updates = [];
     const values = [];
@@ -96,6 +103,7 @@ module.exports = {
     );
   },
 
+  // 게시물 삭제
   async deletePost(post_id) {
     const [rows] = await db.query(
       "DELETE FROM posts WHERE post_id = ?",

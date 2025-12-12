@@ -1,5 +1,8 @@
+// 태그 목록 조회 등 태그 관련 요청 처리 컨트롤러
+
 const tagModel = require("../models/tagModel");
 
+// 태그 생성
 exports.createTag = async (req, res) => {
   try {
     const { tag_name } = req.body;
@@ -11,7 +14,7 @@ exports.createTag = async (req, res) => {
     res.status(500).json({ error: "태그 생성 실패" });
   }
 };
-
+//태그 조회
 exports.getTags = async (req, res) => {
   try {
     const tags = await tagModel.getAllTags();
@@ -20,7 +23,7 @@ exports.getTags = async (req, res) => {
     res.status(500).json({ error: "태그 조회 실패" });
   }
 };
-
+// 태그id - 게시물
 exports.getPostsByTag = async (req, res) => {
   try {
     const tagId = req.params.tag_id;
@@ -30,7 +33,7 @@ exports.getPostsByTag = async (req, res) => {
     res.status(500).json({ error: "게시물 조회 실패" });
   }
 };
-
+// 태그 이름 - 게시물
 exports.getPostsByTagName = async (req, res) => {
   try {
     const tagName = req.params.tag_name;
@@ -46,13 +49,3 @@ exports.getPostsByTagName = async (req, res) => {
     res.status(500).json({ error: "게시물 조회 실패" });
   }
 };
-
-//exports.deleteTag = async (req, res) => {
-//  try {
-//    const tagId = req.params.tag_id;
-//    await tagModel.deleteTag(tagId);
-//    res.json({ message: "태그 삭제 완료" });
-//  } catch (err) {
-//    res.status(500).json({ error: "태그 삭제 실패" });
-//  }
-//};

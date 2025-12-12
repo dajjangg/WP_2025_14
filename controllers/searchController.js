@@ -1,5 +1,8 @@
+// 태그 기반 검색 요청 처리
+
 const searchModel = require("../models/searchModel");
 
+// 태그 기반 검색
 exports.searchPosts = async (req, res) => {
   try {
     const query = req.query.q;

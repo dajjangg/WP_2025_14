@@ -1,3 +1,6 @@
+// 스크랩(즐겨찾기) 기능과 관련된 DB 처리
+// 스크랩 추가/취소, 스크랩 수 조회, 스크랩 여부 확인 등 포함
+
 const db = require("../config/db");
 
 module.exports = {
@@ -19,7 +22,7 @@ module.exports = {
     return result.affectedRows;
   },
 
-  // 특정 게시물 스크랩 수 조회
+  // 특정 게시물이 스크랩된 수 조회
   async countScraps(post_id) {
     const [rows] = await db.query(
       "SELECT scraps_count AS scrapCount FROM posts WHERE post_id = ?",
@@ -28,7 +31,7 @@ module.exports = {
     return rows[0].scrapCount;
   },
 
-  // 특정 사용자가 스크랩했는지 확인
+  // 특정 사용자가 특정 게시물을 스크랩했는지 확인
   async hasUserScrapped(post_id, user_id) {
     const [rows] = await db.query(
       "SELECT 1 FROM scraps WHERE post_id = ? AND user_id = ?",
@@ -44,7 +47,6 @@ module.exports = {
       [post_id]
     );
   },
-
   async decreaseScrapCount(post_id) {
     await db.query(
       "UPDATE posts SET scraps_count = GREATEST(scraps_count - 1, 0) WHERE post_id = ?",
