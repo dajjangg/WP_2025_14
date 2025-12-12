@@ -1,3 +1,6 @@
+// 게시물의 태그 데이터를 저장 및 조회하는 DB 처리
+// 게시물-태그 관계 관련 기능 포함
+
 const db = require("../config/db");
 
 // 태그 생성 또는 기존 태그 찾기
@@ -55,9 +58,3 @@ exports.cleanupOrphanTags = async () => {
     WHERE tag_id NOT IN (SELECT DISTINCT tag_id FROM post_tags)
   `);
 };
-
-
-// 태그 삭제
-//exports.deleteTag = async (tagId) => {
-//  await db.query("DELETE FROM tags WHERE tag_id = ?", [tagId]);
-//};

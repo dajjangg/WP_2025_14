@@ -1,3 +1,5 @@
+// 이미지 파일 업로드 관련 설정 정의
+
 const multer = require("multer");
 const path = require("path");
 
@@ -14,6 +16,7 @@ const storage = multer.diskStorage({
   },
 });
 
+// 업로드
 const upload = multer({ 
   storage,
   limits: {

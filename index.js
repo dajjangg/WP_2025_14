@@ -1,4 +1,5 @@
-// 서버 실행
+// 서버 실행을 위한 진입점 파일
+// app.js를 불러와 포트를 열어 서버 시작
 const app = require("./app");
 const dotenv = require("dotenv");
 

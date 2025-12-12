@@ -1,3 +1,6 @@
+// 메인 서버 파일
+// Express 서버 초기화, 미들웨어 설정, Passport 불러오기, 라우터 연결 등 담당
+
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
@@ -6,6 +9,7 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
 
+// .env 환경 변수 로드
 dotenv.config();
 
 // Passport 설정 불러오기
@@ -27,20 +31,19 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-
-
 // 한글 깨짐 방지
 app.use((req, res, next) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   next();
 });
-
+// 프론트에서 쿠키 포함한 요청 허용
 app.use(cors({
   origin: "http://localhost:3000",
   credentials: true
 }));
 
-// 세션 설정
+
+// 세션 & Passport 설정
 app.use(
   session({
     resave: false,
@@ -52,15 +55,15 @@ app.use(
     },
   })
 );
+// Passport 초기화 및 세션 연동
+app.use(passport.initialize());
+app.use(passport.session());
+passportConfig(passport); // localStrategy 실행해서 로그인 전략 활성화
 
-// Passport 초기화
-app.use(passport.initialize()); // 기본 기능 활성화
-app.use(passport.session());    // 세션과 연동
-passportConfig(passport);       // localStrategy 실행해서 로그인 전략 적용
-
-// 정적 파일 제공 (업로드 이미지 접근 가능)
+// 정적 파일 제공 (이미지 등)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// 기본 테스트용 라우트
 app.get("/", (req, res) => {
   res.json({ message: "서버 정상 작동 중!" });
 });

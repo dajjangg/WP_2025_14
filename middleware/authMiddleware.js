@@ -1,3 +1,6 @@
+// 인증이 필요한 기능을 보호하기 위한 미들웨어
+// 로그인된 사용자만 요청을 수행하도록 권한 확인
+
 // 로그인 여부 확인 미들웨어
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {

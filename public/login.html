@@ -1,3 +1,5 @@
+<!-- 사용자 로그인 페이지 -->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -104,9 +106,8 @@
   </style>
 </head>
 <body>
-  <!-- 네비게이션 -->
   <div class="navbar">
-    <div class="nav-left">🍜 음식 갤러리</div>
+    <div class="nav-left">🍜 Food Gallery</div>
 
     <div class="nav-right">
       <button onclick="goHome()">홈으로</button>
@@ -128,7 +129,7 @@
 <script>
   const form = document.getElementById("loginForm");
   form.addEventListener("submit", async (e) => {
-    e.preventDefault(); // 기본 form 제출 막기
+    e.preventDefault();
 
     const user_name = document.getElementById("user_name").value;
     const password = document.getElementById("password").value;
@@ -153,6 +154,7 @@
       alert("서버 오류 발생");
     }
   });
+  // 홈으로
   function goHome() {
       window.location.href = "/";
   }

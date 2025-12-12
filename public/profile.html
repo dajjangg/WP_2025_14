@@ -1,3 +1,5 @@
+<!-- 사용자의 프로필, 게시물 목록, 스크랩 목록 등을 표시하는 페이지 -->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -60,13 +62,13 @@
     .profile-image-wrapper {
       position: relative;
       width: 120px;
-      margin: 0 auto;   /* 가운데 정렬 */
+      margin: 0 auto;
     }
 
     .profile-edit-btn {
       position: absolute;
-      right: -10px;    /* 사진 오른쪽에 자연스럽게 붙도록 조절 */
-      bottom: 10px;    /* 사진 아래쪽 */
+      right: -10px;
+      bottom: 10px;
       background: #fff;
       border-radius: 50%;
       padding: 8px;
@@ -86,13 +88,12 @@
       width: 520px;
       background: white;
       border-radius: 16px;
-      padding: 40px 40px; /* ⬅⬅ 패딩 크게 증가 */
+      padding: 40px 40px; 
       box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-      margin-top: 20px;  /* 화면 위 여백 더 추가 */
+      margin-top: 20px;
       margin-bottom: 60px;
     }
 
-    /* 프로필 사진 */
     .profile-image {
       width: 120px;
       height: 120px;
@@ -108,7 +109,6 @@
       object-fit: cover;
     }
 
-    /* 닉네임 */
     .nickname-container {
       text-align: center;
       font-size: 22px;
@@ -116,7 +116,6 @@
       margin-top: 15px;
     }
 
-    /* 소개 */
     .intro-container {
       text-align: center;
       font-size: 14px;
@@ -142,11 +141,10 @@
 
     .edit-btn:hover {
       background: #ffe5e5;
-      color: #e74c3c; /* 빨간색 */
+      color: #e74c3c; 
       transform: scale(1.05);
     }
 
-    /* 탭 메뉴 */
     .tabs {
       display: flex;
       background: #f0f0f0;
@@ -214,13 +212,13 @@
 
       .like-btn:hover {
         background: #ffe5e5;
-        color: #e74c3c; /* 빨간색 */
+        color: #e74c3c;
         transform: scale(1.05);
       }
 
       .scrap-btn:hover {
         background: #fff9d9;
-        color: #f1c40f; /* 노란색 */
+        color: #f1c40f; 
         transform: scale(1.05);
       }
 
@@ -238,12 +236,11 @@
         color: #f1c40f;
       }
 
-    /* 오른쪽 모달 */
     #modal {
       position: fixed;
       top: 148px;
       right: 90px;
-      width: 25%;          /* 오른쪽 영역만 사용 (더 좁게) */
+      width: 25%; 
       height: 70%;
       background: white;
       display: none;
@@ -253,7 +250,6 @@
       border-radius: 16px;
     }
 
-    /* 모달 내부 카드 디자인 — 프로필 박스 느낌으로 */
     #modal-content {
       background: white;
       border-radius: 16px;
@@ -263,14 +259,12 @@
       box-sizing: border-box;
     }
 
-    /* 이미지 크기 */
     #modal img {
       width: 100%;
       border-radius: 12px;
       margin-bottom: 15px;
     }
 
-    /* 닫기 버튼 */
     #modal-content button {
       padding: 6px 10px;
       border: 1px solid #ccc;
@@ -282,11 +276,11 @@
 
     .modal-header {
       display: flex;
-      align-items: center;   /* 버튼 세로 가운데 정렬 */
+      align-items: center;
     }
 
     .spacer {
-      flex-grow: 1;          /* 남는 공간을 전부 차지 */
+      flex-grow: 1;
     }
 
     #modal-content button:hover {
@@ -320,20 +314,17 @@
         transform: translateY(-2px);
       }
 
-      /* 닉네임 모달 배경 */
-      /* -------------------- 닉네임/인트로 모달 (중앙) -------------------- */
       .modal {
-        display: none; /* 기본 숨김 */
+        display: none;
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(0,0,0,0.4); /* 반투명 배경 */
+        background: rgba(0,0,0,0.4);
         justify-content: center;
         align-items: center;
         z-index: 3000;
       }
 
-      /* 모달 박스 */
       .modal .modal-content {
         background: #fff;
         border-radius: 12px;
@@ -344,7 +335,6 @@
         animation: fadeIn 0.3s ease;
       }
 
-      /* 입력창 */
       .modal input {
         width: 90%;
         padding: 8px;
@@ -352,7 +342,6 @@
         border: 1px solid #ccc;
         border-radius: 6px;
       }
-      /* 버튼 */
       .modal-buttons button {
         margin: 6px;
         padding: 8px 16px;
@@ -391,14 +380,11 @@
         margin-bottom: 10px;
       }
 
-      /* 애니메이션 */
       @keyframes fadeIn {
         from {opacity: 0; transform: scale(0.9);}
         to {opacity: 1; transform: scale(1);}
       }
 
-      
-      /* 모달 이미지 */
       #modal-img {
         width: 100%;
         border-radius: 12px;
@@ -406,7 +392,6 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       }
 
-      /* 항목 라벨 */
       .info-label {
         font-size: 14px;
         font-weight: 600;
@@ -418,7 +403,6 @@
         gap: 6px;
       }
 
-      /* 내용 텍스트 */
       #modal-content p {
         margin: 3px 0 10px 0;
         font-size: 15px;
@@ -426,7 +410,6 @@
         color: #333;
       }
 
-      /* 태그 스타일 */
       .tag-item {
         background: #eef4ff;
         padding: 6px 12px;
@@ -442,7 +425,6 @@
         background: #dbe9ff;
       }
 
-      /* 댓글 영역 */
       #comments {
         margin-top: 15px;
         padding: 10px 14px;
@@ -462,7 +444,6 @@
         border-bottom: none;
       }
 
-      /* 댓글 작성 */
       #commentInput {
         width: 100%;
         padding: 10px 12px;
@@ -484,7 +465,6 @@
         background: #eee;
       }
 
-      /* 닫기 버튼 */
       #modal-content > button:first-child {
         background: none;
         border: none;
@@ -498,7 +478,7 @@
 </head>
 <body>
   <div class="navbar">
-    <div class="nav-left">🍜 음식 갤러리</div>
+    <div class="nav-left">🍜 Food Gallery</div>
 
     <div class="nav-right">
       <button onclick="goHome()">홈으로</button>
@@ -548,30 +528,23 @@
       <div class="modal-header">
         <button onclick="closeModal()">닫기</button>
 
-        <!-- 자동으로 늘어나는 컨테이너 -->
         <div class="spacer"></div>
-
-        <button id="edit-btn" onclick="editPost()">수정</button>
-        <button id="delete-btn" onclick="deletePost()">삭제</button>
+        <button onclick="editPost()">수정</button>
+        <button onclick="deletePost()">삭제</button>
       </div>
 
       <img id="modal-img" src="" />
 
       <p class="info-label">👤 작성자</p>
       <p id="modal-user"></p>
-
       <p class="info-label">📅 작성일</p>
       <p id="modal-date"></p>
-
       <p class="info-label">✏️ 캡션</p>
       <p id="modal-caption"></p>
-
       <p class="info-label">📝 설명</p>
       <p id="modal-description"></p>
-
       <p class="info-label">🏷 태그</p>
       <p id="modal-tags"></p>
-
       <p class="info-label">🍽 카테고리</p>
       <p id="modal-category"></p>
 
@@ -582,7 +555,6 @@
 
       <h3>댓글</h3>
       <div id="comments"></div>
-
       <h4>댓글 작성</h4>
       <input id="commentInput" type="text" placeholder="댓글 입력" style="width:100%;">
       <button id="commentBtn">등록</button>
@@ -590,8 +562,7 @@
   </div>
 
   <script>
-    let currentTab = "myPosts"; //탭 구분용, 기본값: 내 게시물
-
+    // 로그인 확인
     async function checkLoginStatus() {
       try {
         const res = await fetch("/auth/status", {
@@ -609,15 +580,13 @@
     }
     checkLoginStatus();
 
+    // 태그로 검색
     function searchByTag(tag, event) {
-      event.stopPropagation();  // 모달 클릭 막기
-      // 검색 페이지로 이동하면서 태그 전달
-      window.location.href = `/search.html?tag=${encodeURIComponent(tag)}`;
-    }
-
-    function goHome() {
-      window.location.href = "/";
-    }
+        event.stopPropagation();
+        window.location.href = `/search.html?tag=${encodeURIComponent(tag)}`;
+      }
+    
+    // 업로드 페이지로
     function goUpload() { window.location.href = "/upload.html"; }
 
     //사진 수정용
@@ -635,6 +604,7 @@
 
     let currentPostId = null; // post 수정버튼에서 쓰임
 
+    // 프로필 로드
     async function loadUserProfile() {
       const res = await fetch(`/auth/${userId}/profile`);
       const data = await res.json();
@@ -681,7 +651,7 @@
       // 확인창 띄우기
       const confirmChange = window.confirm("선택한 사진으로 프로필을 변경하시겠습니까?");
       if (!confirmChange) {
-        return; // 취소하면 아무 동작 안 함
+        return;
       }
 
       const formData = new FormData();
@@ -744,6 +714,7 @@
       }
     });
 
+    // 소개
     function showIntroModal(currentIntro) {
       return new Promise((resolve) => {
         const modal = document.getElementById("intro-modal");
@@ -752,7 +723,7 @@
         const cancelBtn = document.getElementById("intro-cancel");
 
         input.value = currentIntro;
-        modal.style.display = "flex"; // 중앙 모달 띄우기
+        modal.style.display = "flex";
 
         saveBtn.onclick = () => {
           modal.style.display = "none";
@@ -811,15 +782,19 @@
       document.getElementById("modal-user").textContent = post.user_name;
       const date = new Date(post.created_at).toLocaleString();
       document.getElementById("modal-date").textContent = date;
-      // 좋아요 / 스크랩 버튼 상태 반영
-      const modalLikeBtn = document.getElementById("modal-like-btn");
-      const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
-      modalLikeBtn.classList.remove("active");
-      modalScrapBtn.classList.remove("active");
+      const editBtn = document.querySelector("#modal-content .modal-header button:nth-child(3)");
+      const deleteBtn = document.querySelector("#modal-content .modal-header button:nth-child(4)");
 
-      modalLikeBtn.classList.toggle("active", post.liked);
-      modalScrapBtn.classList.toggle("active", post.scrapped);
+      editBtn.style.display = "none";
+      deleteBtn.style.display = "none";
+
+      if (post.user_id === loggedInUserId) {
+        editBtn.style.display = "inline-block";
+        deleteBtn.style.display = "inline-block";
+      }
+        const modalLikeBtn = document.getElementById("modal-like-btn");
+        const modalScrapBtn = document.getElementById("modal-scrap-btn");
 
       document.getElementById("modal-like-count").textContent = post.likes_count;
       document.getElementById("modal-scrap-count").textContent = post.scraps_count;
@@ -855,7 +830,7 @@
         deleteBtn.style.display = "inline-block";
       }
     }
-
+    // 모달 닫기
     function closeModal() {
       document.getElementById("modal").style.display = "none";
       currentPostId = null;
@@ -899,7 +874,7 @@
         alert("삭제 중 문제가 발생했습니다.");
       }
     }
-
+    // 모달 좋아요
     async function toggleLikeInModal(post, event) {
       event.stopPropagation();
       if (!loggedInUserId) {
@@ -930,7 +905,7 @@
       post.liked = data.liked;
       post.likes_count = countData.likeCount;
     }
-
+    // 모달 스크랩
     async function toggleScrapInModal(post, event) {
       event.stopPropagation();
       if (!loggedInUserId) {
@@ -1014,7 +989,7 @@
         loadComments(post_id, postOwnerId); // 댓글 즉시 새로고침
       }
     }
-
+    // 댓글 수정
     async function editComment(post_id, postOwnerId, comment_id, oldText) {
       const newText = prompt("댓글 수정:", oldText);
       if (!newText) return;
@@ -1034,6 +1009,7 @@
         alert(data.message || "수정 실패");
       }
     };
+    // 댓글 삭제
     async function deleteComment(post_id, postOwnerId, comment_id) {
       if (!confirm("댓글을 삭제하시겠습니까?")) return;
 

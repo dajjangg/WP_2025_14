@@ -1,6 +1,9 @@
+// 태그 기반 게시물 검색 기능을 위한 DB 처리
+
 const db = require("../config/db");
 
 module.exports = {
+  // 특정 tag(tags)를 포함하는 게시물 정보 가져오기
   async searchByTags(tagNames, user_id) {
     const placeholders = tagNames.map(() => "?").join(",");
 

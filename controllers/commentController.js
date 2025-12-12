@@ -1,9 +1,12 @@
+// 댓글 생성, 조회, 수정, 삭제 요청 처리 컨트롤러
+
 const commentModel = require("../models/commentModel");
 
+// 댓글 생성
 exports.addComment = async (req, res) => {
   try {
-    const post_id = req.params.post_id; // URL에서 가져옴
-    const user_id = req.user.user_id;          // 로그인된 사용자
+    const post_id = req.params.post_id;
+    const user_id = req.user.user_id;
     const { comment } = req.body;
 
     if (!comment || comment.trim() === "") {
@@ -25,7 +28,7 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ error: "댓글 작성 실패" });
   }
 };
-
+// 댓글 조회
 exports.getComments = async (req, res) => {
   try {
     const post_id = req.params.post_id;
@@ -38,7 +41,7 @@ exports.getComments = async (req, res) => {
     res.status(500).json({ error: "댓글 불러오기 실패" });
   }
 };
-
+// 댓글 수정
 exports.updateComment = async (req, res) => {
   try {
     const comment_id = req.params.comment_id;
@@ -61,7 +64,7 @@ exports.updateComment = async (req, res) => {
     res.status(500).json({ error: "댓글 수정 실패" });
   }
 };
-
+// 댓글 삭제
 exports.deleteComment = async (req, res) => {
   try {
     const comment_id = req.params.comment_id;

@@ -1,12 +1,13 @@
+// 회원가입, 로그인, 로그아웃, 프로필 조회/수정 등 사용자 인증 관련 로직 처리 컨트롤러
+
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const userModel = require("../models/userModel");
 const path = require("path");
-// multer 같은 미들웨어를 써서 파일 저장
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 
-
+// 회원가입
 exports.register = async (req, res) => {
   const { user_name, password } = req.body;
 
@@ -25,6 +26,7 @@ exports.register = async (req, res) => {
   }
 };
 
+// 로그인
 exports.login = (req, res, next) => {
   // 이미 로그인된 상태라면 로그인 못 하게 막기
   if (req.isAuthenticated()) {
@@ -44,6 +46,7 @@ exports.login = (req, res, next) => {
   })(req, res, next);
 };
 
+// 로그아웃
 exports.logout = (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(400).json({ message: "로그인 상태가 아닙니다." });
@@ -59,6 +62,7 @@ exports.logout = (req, res) => {
   });
 };
 
+// 프로필 불러오기
 exports.getMyProfile = async (req, res) => {
   try {
     const user_id = req.user.user_id;
@@ -75,7 +79,7 @@ exports.getMyProfile = async (req, res) => {
     res.status(500).json({ error: "프로필 정보 불러오기 실패" });
   }
 };
-
+// 프로필 정보 불러오기
 exports.getUserProfile = async (req, res) => {
   try {
     const userId = req.params.user_id; // URL에서 user id 가져오기
@@ -104,6 +108,7 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
+// 프로필 수정
 exports.updateProfile = async (req, res) => {
   try {
     const { user_name, intro } = req.body;
@@ -138,8 +143,9 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+// 프로필 사진 수정
 exports.updateProfileImage = [
-  upload.single("profile_image"), // formData에서 profile_image 필드 받음
+  upload.single("profile_image"),
   async (req, res) => {
     try {
       const userId = req.params.user_id;
@@ -164,7 +170,7 @@ exports.updateProfileImage = [
   }
 ];
 
-// 닉네임 수정 컨트롤러
+// 닉네임 수정
 exports.updateUserName = async (req, res) => {
   try {
     const userId = req.params.user_id;
@@ -192,7 +198,7 @@ exports.updateUserName = async (req, res) => {
   }
 };
 
-// 한 줄 소개 수정 컨트롤러
+// 한 줄 소개 수정
 exports.updateIntro = async (req, res) => {
   try {
     const userId = req.params.user_id;

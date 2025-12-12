@@ -1,5 +1,8 @@
+// 스크랩(즐겨찾기) 추가/삭제 및 개수 조회 요청 처리 컨트롤러
+
 const scrapModel = require("../models/scrapModel");
 
+// 스크랩 추가/취소
 exports.toggleScrap = async (req, res) => {
   try {
     const post_id = req.params.post_id;
@@ -25,7 +28,7 @@ exports.toggleScrap = async (req, res) => {
     res.status(500).json({ error: "스크랩 토글 실패" });
   }
 };
-
+// 스크랩 수 조회
 exports.getScrapCount = async (req, res) => {
   try {
     const post_id = req.params.post_id;
